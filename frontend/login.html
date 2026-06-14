@@ -528,9 +528,16 @@
   import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-analytics.js";
   import {
     getAuth,
+    setPersistence,
+    browserLocalPersistence,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult,
+    getAdditionalUserInfo,
+    deleteUser,
+    signOut,
     GoogleAuthProvider,
     OAuthProvider,
     updateProfile,
@@ -547,8 +554,11 @@
   const firebaseConfig = await loadFirebaseConfig();
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const authReady = setPersistence(auth,browserLocalPersistence);
   const googleProvider = new GoogleAuthProvider();
   const appleProvider = new OAuthProvider('apple.com');
+  googleProvider.setCustomParameters({prompt:'select_account'});
+  appleProvider.setCustomParameters({locale:'en'});
   isSupported().then((supported) => {
     if (supported) getAnalytics(app);
   }).catch(() => {});
@@ -634,9 +644,12 @@
   function firebaseMessage(error){
     const code=error&&error.code?error.code:'';
     const messages={
+      'auth/account-exists-with-different-credential':'An account already exists with this email. Try the original sign-in method.',
       'auth/email-already-in-use':'An account with this email already exists.',
       'auth/invalid-email':'Please enter a valid email address.',
       'auth/invalid-credential':'Invalid email or password.',
+      'auth/operation-not-allowed':'Google sign-in is not enabled for this Firebase project.',
+      'auth/popup-blocked':'Popup was blocked. Redirecting to Google sign-in...',
       'auth/popup-closed-by-user':'Sign-in was cancelled.',
       'auth/weak-password':'Password must be at least 6 characters.',
       'auth/user-disabled':'This account has been disabled.',
@@ -646,20 +659,43 @@
     return messages[code]||'Authentication failed. Please try again.';
   }
 
-  function finishAuth(data,msg){
-    localStorage.setItem('echo_auth_token',data.token);
-    localStorage.setItem('echo_user_name',data.user.name);
-    localStorage.setItem('echo_user_email',data.user.email);
+  async function finishAuth(user,msg){
+    const token=await user.getIdToken();
+    const email=user.email||'';
+    const fallbackName=email?email.split('@')[0].replace(/[._-]+/g,' '):'Music Creator';
+    localStorage.setItem('echo_auth_token',token);
+    localStorage.setItem('echo_user_name',user.displayName||fallbackName);
+    localStorage.setItem('echo_user_email',email);
     showMsg(msg,'success');
     setTimeout(()=>{window.location.href='dashboard.html';},700);
+  }
+
+  async function blockNewProviderLogin(result,mode){
+    const info=getAdditionalUserInfo(result);
+    if(mode!=='signup'&&info&&info.isNewUser){
+      try{await deleteUser(result.user);}
+      catch(_){await signOut(auth).catch(()=>{});}
+      setAuthMode('signup');
+      showMsg('No account found for this Google email. Please sign up first.','error');
+      return true;
+    }
+    return false;
   }
 
   async function handleProvider(provider){
     hideMsg();
     try{
+      await authReady;
       const result=await signInWithPopup(auth,provider);
+      if(await blockNewProviderLogin(result,authMode)) return;
       await finishAuth(result.user,'Signed in! Redirecting…');
     }catch(err){
+      if(err&&['auth/popup-blocked','auth/popup-closed-by-user','auth/cancelled-popup-request'].includes(err.code)){
+        showMsg(firebaseMessage(err),'error');
+        sessionStorage.setItem('echo_provider_auth_mode',authMode);
+        await signInWithRedirect(auth,provider);
+        return;
+      }
       showMsg(firebaseMessage(err),'error');
     }
   }
@@ -695,6 +731,7 @@
     btn.disabled=true;span.textContent=authMode==='signup'?'Creating account…':'Signing in…';
 
     try{
+      await authReady;
       if(authMode==='signup'){
         const confirm=document.getElementById('confirm-pw').value;
         const first=document.getElementById('first-name').value.trim();
@@ -725,10 +762,21 @@
     handleForgotPassword
   });
 
-  (function(){
+  (async function(){
     setAuthMode('login');
     if(localStorage.getItem('echo_auth_token')){
       window.location.href='dashboard.html';
+      return;
+    }
+    try{
+      await authReady;
+      const result=await getRedirectResult(auth);
+      const providerMode=sessionStorage.getItem('echo_provider_auth_mode')||'login';
+      sessionStorage.removeItem('echo_provider_auth_mode');
+      if(result&&result.user&&await blockNewProviderLogin(result,providerMode)) return;
+      if(result&&result.user) await finishAuth(result.user,'Signed in! Redirectingâ€¦');
+    }catch(err){
+      showMsg(firebaseMessage(err),'error');
     }
   })();
 </script>
