@@ -107,8 +107,8 @@
         // soft round particle
         float r = length(gl_PointCoord - 0.5);
         float alpha = smoothstep(0.5, 0.16, r);
-        // crests darker, troughs lighter — reads as real depth on white
-        float shade = clamp(0.74 - vHeight * 0.09 - vShade * 0.14, 0.30, 0.86);
+        // crests slightly darker, troughs lighter — soft light grey dots
+        float shade = clamp(0.88 - vHeight * 0.03 - vShade * 0.04, 0.78, 0.95);
         // white "fog": far dots melt into the page background
         alpha *= (1.0 - smoothstep(16.0, 52.0, vDist)) * 0.92;
         gl_FragColor = vec4(vec3(shade), alpha);
@@ -122,9 +122,9 @@
   spriteCanvas.width = spriteCanvas.height = 64;
   const sctx = spriteCanvas.getContext('2d');
   const grad = sctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-  grad.addColorStop(0, 'rgba(120,120,120,1)');
-  grad.addColorStop(0.5, 'rgba(120,120,120,.35)');
-  grad.addColorStop(1, 'rgba(120,120,120,0)');
+  grad.addColorStop(0, 'rgba(195,195,195,1)');
+  grad.addColorStop(0.5, 'rgba(195,195,195,.35)');
+  grad.addColorStop(1, 'rgba(195,195,195,0)');
   sctx.fillStyle = grad;
   sctx.fillRect(0, 0, 64, 64);
   const DUST = 260;
@@ -138,7 +138,7 @@
   const dustGeo = new THREE.BufferGeometry();
   dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
   const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({
-    size: 0.55, map: new THREE.CanvasTexture(spriteCanvas), color: 0x9a9a9a,
+    size: 0.55, map: new THREE.CanvasTexture(spriteCanvas), color: 0xc8c8c8,
     transparent: true, opacity: 0.32, depthWrite: false, sizeAttenuation: true,
   }));
   scene.add(dust);
