@@ -719,10 +719,14 @@
     const hardStop = setTimeout(() => instrumentalAbort.abort(), 300000);
 
     try {
+      const token = localStorage.getItem('echo_auth_token');
       const data = await fetchJSON(API_BASE + '/generate', {
         method: 'POST',
         signal: instrumentalAbort.signal,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+        },
         body: JSON.stringify({
           mode: selectedMode,
           duration: 30,

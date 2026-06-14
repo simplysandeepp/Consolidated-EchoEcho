@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import logging
 import os
 import secrets
 import string
 import time
+import wave
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 from datetime import datetime, timezone
@@ -14,7 +16,7 @@ from pathlib import Path
 from threading import Lock, Thread
 from typing import Any, Literal
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -38,7 +40,7 @@ from .music_generator import (
     generate_music,
     load_model,
 )
-from .auth import AuthError, login as auth_login, signup as auth_signup
+from .auth import AuthError, login as auth_login, signup as auth_signup, user_email_for_token
 from .composer import compose_song
 from .transcriber import TranscriptionError, transcribe_audio
 from .agents.lyrics_agent import generate_lyrics as generate_agent_lyrics
@@ -52,9 +54,14 @@ PROJECT_DIR = BASE_DIR.parent
 FRONTEND_DIR = PROJECT_DIR / "frontend"
 GENERATED_DIR = BASE_DIR / "generated"
 STATIC_DIR = BASE_DIR / "static"
-HISTORY_FILE = BASE_DIR / "song_history.json"
+DATA_DIR = PROJECT_DIR / "data"
+USER_DATA_DIR = DATA_DIR / "users"
+DEFAULT_HISTORY_FILE = BASE_DIR / "song_history.json"
+HISTORY_FILE = DEFAULT_HISTORY_FILE
 CALLBACK_FILE = BASE_DIR / "kiai_callbacks.json"
 LEGACY_CALLBACK_FILE = BASE_DIR / "kieai_callbacks.json"
+DEFAULT_USER_EMAIL = "test@echo.com"
+DEFAULT_USER_ID = hashlib.sha256(DEFAULT_USER_EMAIL.encode("utf-8")).hexdigest()[:12]
 
 load_dotenv(PROJECT_DIR / ".env")
 load_dotenv(BASE_DIR / ".env")
@@ -193,44 +200,139 @@ app.add_middleware(
 def ensure_files() -> None:
     GENERATED_DIR.mkdir(parents=True, exist_ok=True)
     STATIC_DIR.mkdir(parents=True, exist_ok=True)
-    if not HISTORY_FILE.exists():
+    USER_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    default_user_file = user_songs_path(DEFAULT_USER_ID)
+    if not default_user_file.exists():
+        legacy_history = []
+        if HISTORY_FILE == DEFAULT_HISTORY_FILE and HISTORY_FILE.exists():
+            legacy_history = read_json_list_no_ensure(HISTORY_FILE)
+        default_user_file.write_text(json.dumps(legacy_history, indent=2), encoding="utf-8")
+    if HISTORY_FILE != DEFAULT_HISTORY_FILE and not HISTORY_FILE.exists():
         HISTORY_FILE.write_text("[]", encoding="utf-8")
     if LEGACY_CALLBACK_FILE.exists() and not CALLBACK_FILE.exists():
         LEGACY_CALLBACK_FILE.replace(CALLBACK_FILE)
     if not CALLBACK_FILE.exists():
         CALLBACK_FILE.write_text("[]", encoding="utf-8")
 
-
-ensure_files()
-
-
-def read_json_list(path: Path) -> list[dict[str, Any]]:
-    ensure_files()
+def read_json_list_no_ensure(path: Path) -> list[dict[str, Any]]:
     try:
         raw = path.read_text(encoding="utf-8").strip()
         data = json.loads(raw or "[]")
         return data if isinstance(data, list) else []
-    except json.JSONDecodeError:
+    except (FileNotFoundError, json.JSONDecodeError):
         logger.exception("%s is not valid JSON", path.name)
         return []
 
 
+def read_json_list(path: Path) -> list[dict[str, Any]]:
+    ensure_files()
+    return read_json_list_no_ensure(path)
+
+
 def write_json_list(path: Path, data: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
-def read_history() -> list[dict[str, Any]]:
-    return read_json_list(HISTORY_FILE)
+def sanitize_user_id(user_id: str) -> str:
+    cleaned = "".join(ch for ch in user_id.strip().lower() if ch.isalnum() or ch in {"_", "-"})
+    return cleaned or DEFAULT_USER_ID
 
 
-def write_history(history: list[dict[str, Any]]) -> None:
-    write_json_list(HISTORY_FILE, history)
+def user_id_from_email(email: str) -> str:
+    normalized = email.strip().lower() or DEFAULT_USER_EMAIL
+    return hashlib.sha256(normalized.encode("utf-8")).hexdigest()[:12]
 
 
-def append_history(record: dict[str, Any]) -> None:
-    history = read_history()
-    history.append(record)
-    write_history(history)
+def user_songs_path(user_id: str) -> Path:
+    if HISTORY_FILE != DEFAULT_HISTORY_FILE and sanitize_user_id(user_id) == DEFAULT_USER_ID:
+        return HISTORY_FILE
+    return USER_DATA_DIR / f"user_{sanitize_user_id(user_id)}.json"
+
+
+def load_user_songs(user_id: str) -> list[dict[str, Any]]:
+    path = user_songs_path(user_id)
+    if not path.exists():
+        write_json_list(path, [])
+    return read_json_list(path)
+
+
+def write_user_songs(user_id: str, songs: list[dict[str, Any]]) -> None:
+    write_json_list(user_songs_path(user_id), songs)
+
+
+def generate_song_id(existing_ids: set[str] | None = None) -> str:
+    existing = existing_ids or set()
+    alphabet = string.ascii_uppercase
+    for _ in range(1000):
+        song_id = "".join(secrets.choice(alphabet) for _ in range(4))
+        if song_id not in existing:
+            return song_id
+    raise RuntimeError("Could not create a unique song ID.")
+
+
+def save_user_song(user_id: str, song_data: dict[str, Any]) -> dict[str, Any]:
+    songs = load_user_songs(user_id)
+    existing_ids = {record_code(song) for song in songs}
+    song_id = record_code(song_data)
+    if not song_id or song_id in existing_ids:
+        song_id = generate_song_id(existing_ids)
+        song_data["song_id"] = song_id
+        song_data["code"] = song_id
+        song_data["id"] = song_id
+
+    song_data.setdefault("song_id", song_id)
+    song_data.setdefault("code", song_id)
+    song_data.setdefault("id", song_id)
+    song_data.setdefault("created_at", datetime.now(timezone.utc).isoformat())
+    song_data.setdefault("title", record_title(song_data))
+    song_data.setdefault("genre", song_data.get("style") or "")
+    song_data.setdefault("bpm", song_data.get("tempo") or 90)
+    song_data.setdefault("duration", 0)
+    song_data.setdefault("audio_url", "")
+    song_data.setdefault("lyrics", "")
+    songs.append(song_data)
+    write_user_songs(user_id, songs)
+    return song_data
+
+
+def auth_token_from_request(request: Request | None) -> str:
+    if request is None:
+        return ""
+    value = request.headers.get("authorization", "")
+    if value.lower().startswith("bearer "):
+        return value.split(" ", 1)[1].strip()
+    return ""
+
+
+def current_user_id(request: Request | None) -> str:
+    email = user_email_for_token(auth_token_from_request(request))
+    if email:
+        return user_id_from_email(email)
+    return DEFAULT_USER_ID
+
+
+def iter_user_song_files() -> list[Path]:
+    ensure_files()
+    files = list(USER_DATA_DIR.glob("user_*.json"))
+    if HISTORY_FILE != DEFAULT_HISTORY_FILE and HISTORY_FILE.exists():
+        files.append(HISTORY_FILE)
+    return files
+
+
+def read_history(user_id: str = DEFAULT_USER_ID) -> list[dict[str, Any]]:
+    return load_user_songs(user_id)
+
+
+def write_history(history: list[dict[str, Any]], user_id: str = DEFAULT_USER_ID) -> None:
+    write_user_songs(user_id, history)
+
+
+def append_history(record: dict[str, Any], user_id: str = DEFAULT_USER_ID) -> None:
+    save_user_song(user_id, record)
+
+
+ensure_files()
 
 
 def read_callbacks() -> list[dict[str, Any]]:
@@ -337,6 +439,10 @@ def copyright_check_text(payload: CopyrightCheckApiRequest, record: dict[str, An
         return lyrics_text
 
     record = record or {}
+    if isinstance(record.get("lyrics"), str):
+        saved_lyrics_text = str(record.get("lyrics") or "").strip()
+        if saved_lyrics_text:
+            return saved_lyrics_text
     record_lyrics = record.get("lyrics") if isinstance(record.get("lyrics"), dict) else {}
     saved_lyrics = str(record_lyrics.get("text") or "").strip()
     if saved_lyrics and record_lyrics.get("structure") != "unavailable":
@@ -398,9 +504,90 @@ def media_type_for(filename: str) -> str:
     return "audio/mpeg" if filename.lower().endswith(".mp3") else "audio/wav"
 
 
-def find_history_record(code: str) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
+def generated_url(filename: str) -> str:
+    return f"/generated/{Path(filename).name}"
+
+
+def generated_audio_path(filename: str) -> Path:
+    return GENERATED_DIR / Path(filename).name
+
+
+def audio_duration_seconds(path: Path, fallback_seconds: int | float | None = None) -> int:
+    try:
+        if path.suffix.lower() == ".wav":
+            with wave.open(str(path), "rb") as wav_file:
+                frame_rate = wav_file.getframerate()
+                if frame_rate > 0:
+                    return max(1, int(round(wav_file.getnframes() / frame_rate)))
+
+        from pydub import AudioSegment
+
+        audio = AudioSegment.from_file(path)
+        return max(1, int(round(len(audio) / 1000)))
+    except Exception as exc:
+        logger.warning("Could not read audio duration for %s: %s", path, exc)
+        if fallback_seconds:
+            return max(1, int(round(float(fallback_seconds))))
+        return 0
+
+
+def record_title(record: dict[str, Any]) -> str:
+    title = str(record.get("title") or "").strip()
+    if title:
+        return title
+    mood = str(record.get("mood") or "").strip()
+    theme = str(record.get("theme") or "").strip()
+    style = str(record.get("style") or record.get("genre") or "").strip()
+    parts = [part for part in (mood, theme or style) if part]
+    return " · ".join(parts) or "Generated Track"
+
+
+def finalize_generated_record(
+    record: dict[str, Any],
+    *,
+    fallback_duration: int | float | None = None,
+    title: str | None = None,
+    genre: str | None = None,
+    bpm: int | None = None,
+) -> dict[str, Any]:
+    filename = original_filename(record)
+    if not filename:
+        raise RuntimeError("Generated audio metadata did not include a filename.")
+
+    output_path = generated_audio_path(filename)
+    if not output_path.exists() or output_path.stat().st_size == 0:
+        raise RuntimeError(f"Generated audio file was not found on disk: {output_path}")
+
+    duration = audio_duration_seconds(output_path, fallback_duration)
+    audio_url = generated_url(filename)
+    relative_path = f"generated/{filename}"
+    song_id = record_code(record)
+
+    record.update(
+        {
+            "id": song_id or record.get("id"),
+            "title": title or record_title(record),
+            "genre": genre or record.get("genre") or record.get("style") or "",
+            "bpm": bpm or record.get("bpm") or record.get("tempo"),
+            "duration": duration,
+            "audio_path": relative_path,
+            "audio_url": audio_url,
+            "filename": filename,
+            "audio_filename": filename,
+            "original_audio_filename": record.get("original_audio_filename") or filename,
+            "output_file": relative_path,
+        }
+    )
+
+    logger.info("Generated file: %s", output_path)
+    logger.info("Audio URL: %s", audio_url)
+    logger.info("Duration: %s", duration)
+    return record
+
+
+def find_history_record(code: str, user_id: str = DEFAULT_USER_ID) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
     normalized = code.upper()
-    history = read_history()
+    history = read_history(user_id)
     for record in history:
         if record_code(record) == normalized:
             return history, record
@@ -413,18 +600,23 @@ def with_urls(record: dict[str, Any]) -> dict[str, Any]:
     trimmed = trimmed_filename(record)
     source_url = record.get("audio_source_url") or None
 
-    local_original_exists = original and (GENERATED_DIR / original).exists()
-    original_url = f"/generated/{original}" if local_original_exists else source_url
+    local_original_exists = original and generated_audio_path(original).exists()
+    original_url = generated_url(original) if original else source_url
 
-    local_trimmed_exists = trimmed and (GENERATED_DIR / trimmed).exists()
-    trimmed_url = f"/generated/{trimmed}" if local_trimmed_exists else None
+    local_trimmed_exists = trimmed and generated_audio_path(trimmed).exists()
+    trimmed_url = generated_url(trimmed) if local_trimmed_exists else None
 
     return {
         **record,
+        "id": record.get("id") or code,
+        "title": record_title(record),
+        "genre": record.get("genre") or record.get("style") or "",
+        "bpm": record.get("bpm") or record.get("tempo"),
         "code": code,
         "song_id": code,
         "filename": original,
         "audio_filename": original,
+        "audio_path": f"generated/{original}" if original else record.get("audio_path"),
         "audio_url": original_url,
         "original_audio_url": original_url,
         "original_download_url": f"/download/{code}/original" if code else None,
@@ -523,12 +715,11 @@ def warm_model() -> None:
             model_error = str(error)
 
 
-def create_song_id(extension: str) -> str:
-    existing_ids = {record_code(record) for record in read_history()}
-    alphabet = string.ascii_uppercase
+def create_song_id(extension: str, user_id: str = DEFAULT_USER_ID) -> str:
+    existing_ids = {record_code(record) for record in read_history(user_id)}
     for _ in range(1000):
-        song_id = "".join(secrets.choice(alphabet) for _ in range(4))
-        if song_id not in existing_ids and not (GENERATED_DIR / f"{song_id}.{extension}").exists():
+        song_id = generate_song_id(existing_ids)
+        if not (GENERATED_DIR / f"{song_id}.{extension}").exists():
             return song_id
     raise RuntimeError("Could not create a unique song ID.")
 
@@ -554,11 +745,11 @@ def api_input_from_request(request: GenerateRequest) -> ApiGenerationInput:
     )
 
 
-async def generate_with_api(request: GenerateRequest) -> dict[str, Any]:
+async def generate_with_api(request: GenerateRequest, user_id: str = DEFAULT_USER_ID) -> dict[str, Any]:
     reset_generation_status(60)
     update_generation_status("Submitting API generation", 10)
     try:
-        history = read_history()
+        history = read_history(user_id)
         existing_ids = {record_code(item) for item in history}
         generated = await generate_api_song(
             api_input_from_request(request),
@@ -567,13 +758,18 @@ async def generate_with_api(request: GenerateRequest) -> dict[str, Any]:
         )
         generated["mode"] = "api"
         generated["fast"] = request.fast
-        generated["duration"] = request.duration
         filename = original_filename(generated)
         generated["filename"] = filename
         generated["audio_filename"] = filename
-        generated["audio_url"] = f"/generated/{filename}" if filename else None
+        finalize_generated_record(
+            generated,
+            fallback_duration=request.duration,
+            title=record_title(generated),
+            genre=generated.get("style") or request.style or first_or_join(request.genres, ""),
+            bpm=generated.get("tempo") or request.tempo,
+        )
         add_agent_sections(generated, request, str(generated.get("prompt") or ""))
-        append_history(generated)
+        save_user_song(user_id, generated)
         update_generation_status("Completed", 100)
         return unified_response(generated)
     except KieAIConfigError as exc:
@@ -590,12 +786,12 @@ async def generate_with_api(request: GenerateRequest) -> dict[str, Any]:
         raise HTTPException(status_code=500, detail="API song generation failed. Please try again.") from exc
 
 
-def generate_with_musicgen(request: GenerateRequest) -> dict[str, Any]:
+def generate_with_musicgen(request: GenerateRequest, user_id: str = DEFAULT_USER_ID) -> dict[str, Any]:
     total_start = time.perf_counter()
     reset_generation_status()
     update_generation_status("Preparing prompt", 0)
     try:
-        song_id = create_song_id("wav")
+        song_id = create_song_id("wav", user_id)
         filename = f"{song_id}.wav"
         output_path = GENERATED_DIR / filename
     except Exception as error:
@@ -670,18 +866,25 @@ def generate_with_musicgen(request: GenerateRequest) -> dict[str, Any]:
         "audio_url": f"/generated/{filename}",
         "inference_seconds": round(float(generation_result.get("inference_seconds", 0)), 2),
     }
+    finalize_generated_record(
+        record,
+        fallback_duration=request.duration,
+        title=record_title(record),
+        genre=record.get("style") or first_or_join(request.genres, ""),
+        bpm=request.tempo,
+    )
     add_agent_sections(record, request, prompt)
-    append_history(record)
+    save_user_song(user_id, record)
     update_generation_status("Completed", 100)
     return unified_response(record)
 
 
-async def generate_with_ace_step_mode(request: GenerateRequest) -> dict[str, Any]:
+async def generate_with_ace_step_mode(request: GenerateRequest, user_id: str = DEFAULT_USER_ID) -> dict[str, Any]:
     reset_generation_status(600)
     update_generation_status("Generating lyrics for ACE-Step", 10)
     try:
-        song_id = create_song_id("mp3")
-        filename = f"ECHO_{song_id}_ace.mp3"
+        song_id = create_song_id("wav", user_id)
+        filename = f"ECHO_{song_id}_ace.wav"
         output_path = GENERATED_DIR / filename
 
         mood = first_or_join(request.moods or ([request.mood] if request.mood else []), "dreamy")
@@ -712,6 +915,11 @@ async def generate_with_ace_step_mode(request: GenerateRequest) -> dict[str, Any
             energy=request.energy,
             output_path=output_path,
         )
+        generated_path = Path(str(ace_result.get("audio_path") or output_path))
+        if generated_path.parent == GENERATED_DIR:
+            filename = generated_path.name
+        else:
+            filename = Path(filename).name
 
         update_generation_status("Checking copyright", 90)
         copyright_result = generate_copyright_section(lyrics_text, lyrics_ok)
@@ -738,7 +946,14 @@ async def generate_with_ace_step_mode(request: GenerateRequest) -> dict[str, Any
             "lyrics": lyrics_result,
             "copyright": copyright_result,
         }
-        append_history(record)
+        finalize_generated_record(
+            record,
+            fallback_duration=request.duration or 30,
+            title=record_title(record),
+            genre=style,
+            bpm=request.tempo,
+        )
+        save_user_song(user_id, record)
         update_generation_status("Completed", 100)
         return unified_response(record)
     except Exception as exc:
@@ -849,12 +1064,13 @@ def api_ace_step_lyrics(request: AceStepLyricsRequest) -> dict[str, Any]:
 
 
 @app.post("/api/kie-vocal")
-async def kie_vocal_generate(request: KieVocalRequest) -> dict[str, Any]:
+async def kie_vocal_generate(request: KieVocalRequest, http_request: Request) -> dict[str, Any]:
     """Generate a full vocal singing track via Kie.ai → Suno (instrumental=False)."""
     reset_generation_status(180)
     update_generation_status("Submitting vocal request to Kie.ai", 8)
     try:
-        history = read_history()
+        user_id = current_user_id(http_request)
+        history = read_history(user_id)
         existing_ids = {record_code(item) for item in history}
 
         style = request.style or request.genre or "Pop"
@@ -884,12 +1100,18 @@ async def kie_vocal_generate(request: KieVocalRequest) -> dict[str, Any]:
         generated["mode"] = "kie-vocal"
         generated["filename"] = serve_file
         generated["audio_filename"] = serve_file
-        generated["audio_url"] = f"/generated/{serve_file}" if serve_file else None
         generated["genre"] = request.genre
         generated["mood_tag"] = request.mood
         generated["bpm"] = request.bpm
+        finalize_generated_record(
+            generated,
+            fallback_duration=60,
+            title=record_title(generated),
+            genre=request.genre or generated.get("style") or "",
+            bpm=request.bpm,
+        )
 
-        append_history(generated)
+        save_user_song(user_id, generated)
         update_generation_status("Done", 100)
         return {"ok": True, "track": generated}
 
@@ -922,25 +1144,26 @@ async def api_transcribe(file: UploadFile = File(...)) -> dict[str, Any]:
 
 
 @app.post("/generate")
-async def generate(request: GenerateRequest) -> dict[str, Any]:
+async def generate(request: GenerateRequest, http_request: Request) -> dict[str, Any]:
+    user_id = current_user_id(http_request)
     mode = normalize_mode(request.mode)
     if mode == "api":
-        return await generate_with_api(request)
+        return await generate_with_api(request, user_id)
     if mode == "ace-step":
-        return await generate_with_ace_step_mode(request)
-    return generate_with_musicgen(request)
+        return await generate_with_ace_step_mode(request, user_id)
+    return generate_with_musicgen(request, user_id)
 
 
 @app.post("/api/generate")
-async def api_generate(request: GenerateRequest) -> dict[str, Any]:
+async def api_generate(request: GenerateRequest, http_request: Request) -> dict[str, Any]:
     request.mode = "api"
     request.fast = True
-    return await generate_with_api(request)
+    return await generate_with_api(request, current_user_id(http_request))
 
 
 @app.post("/generate-inspiration")
-async def generate_inspiration(request: GenerateRequest) -> dict[str, Any]:
-    return await api_generate(request)
+async def generate_inspiration(request: GenerateRequest, http_request: Request) -> dict[str, Any]:
+    return await api_generate(request, http_request)
 
 
 @app.get("/health")
@@ -950,12 +1173,13 @@ def health() -> dict[str, Any]:
 
 
 @app.get("/status")
-def status() -> dict[str, Any]:
+def status(request: Request) -> dict[str, Any]:
+    user_id = current_user_id(request)
     with model_lock:
         return {
             "ok": True,
             "service": "Echo Echo",
-            "history_count": len(read_history()),
+            "history_count": len(read_history(user_id)),
             "status": model_status,
             "model_loaded": model is not None,
             "processor_loaded": processor is not None,
@@ -987,32 +1211,33 @@ def get_generation_status() -> dict[str, Any]:
 
 
 @app.get("/history")
-def history() -> dict[str, Any]:
-    records = [with_urls(item) for item in read_history()]
+def history(request: Request) -> dict[str, Any]:
+    records = [with_urls(item) for item in read_history(current_user_id(request))]
     return {"songs": list(reversed(records))}
 
 
 @app.get("/songs")
-def songs() -> dict[str, Any]:
-    return history()
+def songs(request: Request) -> dict[str, Any]:
+    return history(request)
 
 
 @app.get("/inspirations")
-def inspirations() -> dict[str, Any]:
-    return history()
+def inspirations(request: Request) -> dict[str, Any]:
+    return history(request)
 
 
 @app.get("/library/refresh")
-def refresh_library() -> dict[str, Any]:
-    return history()
+def refresh_library(request: Request) -> dict[str, Any]:
+    return history(request)
 
 
 @app.post("/api/copyright/check")
-def api_copyright_check(request: CopyrightCheckApiRequest) -> dict[str, Any]:
+def api_copyright_check(request: CopyrightCheckApiRequest, http_request: Request) -> dict[str, Any]:
+    user_id = current_user_id(http_request)
     history_records: list[dict[str, Any]] = []
     record: dict[str, Any] | None = None
     if request.song_id:
-        history_records, record = find_history_record(request.song_id)
+        history_records, record = find_history_record(request.song_id, user_id)
 
     text = copyright_check_text(request, record)
     if not text:
@@ -1027,23 +1252,24 @@ def api_copyright_check(request: CopyrightCheckApiRequest) -> dict[str, Any]:
 
     if record is not None:
         record["copyright"] = result
-        write_history(history_records)
+        write_history(history_records, user_id)
 
     return result
 
 
 @app.get("/song/{song_id}")
-def song(song_id: str) -> dict[str, Any]:
-    _, record = find_history_record(song_id)
+def song(song_id: str, request: Request) -> dict[str, Any]:
+    _, record = find_history_record(song_id, current_user_id(request))
     if record:
         return {"song": with_urls(record)}
     raise HTTPException(status_code=404, detail="Song not found")
 
 
 @app.post("/api/library/{code}/trim")
-def trim_library_item(code: str, request: TrimRequest | None = None) -> dict[str, Any]:
+def trim_library_item(code: str, http_request: Request, request: TrimRequest | None = None) -> dict[str, Any]:
+    user_id = current_user_id(http_request)
     request = request or TrimRequest()
-    history, record = find_history_record(code)
+    history, record = find_history_record(code, user_id)
     if not record:
         raise HTTPException(status_code=404, detail="Library item not found.")
 
@@ -1062,7 +1288,7 @@ def trim_library_item(code: str, request: TrimRequest | None = None) -> dict[str
     destination = GENERATED_DIR / destination_name
     if destination.exists() and not request.force:
         record["trimmed_audio_filename"] = destination_name
-        write_history(history)
+        write_history(history, user_id)
         return {"ok": True, "song": with_urls(record)}
 
     duration = request.duration_seconds or get_default_trim_duration_seconds()
@@ -1076,7 +1302,7 @@ def trim_library_item(code: str, request: TrimRequest | None = None) -> dict[str
     record["trimmed_audio_filename"] = destination_name
     record["trimmed_duration_seconds"] = duration
     record["trimmed_created_at"] = datetime.now(timezone.utc).isoformat()
-    write_history(history)
+    write_history(history, user_id)
     return {"ok": True, "song": with_urls(record)}
 
 
@@ -1106,16 +1332,17 @@ def store_callback(payload: dict[str, Any]) -> dict[str, Any]:
     write_callbacks(callbacks)
 
     if task_id:
-        history_records = read_history()
-        updated = False
-        for record in history_records:
-            if record.get("task_id") == task_id:
-                record["callback_status"] = event["status"]
-                record["callback_received_at"] = received_at
-                record["callback_payload"] = payload
-                updated = True
-        if updated:
-            write_history(history_records)
+        for song_file in iter_user_song_files():
+            history_records = read_json_list(song_file)
+            updated = False
+            for record in history_records:
+                if record.get("task_id") == task_id:
+                    record["callback_status"] = event["status"]
+                    record["callback_received_at"] = received_at
+                    record["callback_payload"] = payload
+                    updated = True
+            if updated:
+                write_json_list(song_file, history_records)
     return event
 
 
@@ -1135,13 +1362,13 @@ def kieai_callbacks() -> dict[str, Any]:
 
 
 @app.get("/download/{code}")
-def download(code: str) -> FileResponse:
-    return download_original(code)
+def download(code: str, request: Request) -> FileResponse:
+    return download_original(code, request)
 
 
 @app.get("/download/{code}/original")
-def download_original(code: str) -> FileResponse:
-    _, record = find_history_record(code)
+def download_original(code: str, request: Request) -> FileResponse:
+    _, record = find_history_record(code, current_user_id(request))
     if not record:
         raise HTTPException(status_code=404, detail="Library item not found.")
     filename = original_filename(record)
@@ -1154,8 +1381,8 @@ def download_original(code: str) -> FileResponse:
 
 
 @app.get("/download/{code}/trimmed")
-def download_trimmed(code: str) -> FileResponse:
-    _, record = find_history_record(code)
+def download_trimmed(code: str, request: Request) -> FileResponse:
+    _, record = find_history_record(code, current_user_id(request))
     if not record:
         raise HTTPException(status_code=404, detail="Library item not found.")
     filename = trimmed_filename(record)

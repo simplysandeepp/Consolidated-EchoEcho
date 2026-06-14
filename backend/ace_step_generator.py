@@ -134,6 +134,9 @@ def generate_with_ace_step(
     logger.info("ACE-Step: audio ready at %s", audio_src)
 
     if output_path:
+        source_path = Path(str(audio_src))
+        if source_path.suffix and source_path.suffix.lower() in {".mp3", ".wav", ".flac", ".ogg", ".m4a"}:
+            output_path = output_path.with_suffix(source_path.suffix.lower())
         output_path.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(str(audio_src), str(output_path))
         logger.info("ACE-Step: saved to %s", output_path)

@@ -1,0 +1,37 @@
+[
+  {
+    "mode": "ace-step",
+    "code": "IPLE",
+    "song_id": "IPLE",
+    "created_at": "2026-06-14T16:17:06.193736+00:00",
+    "prompt": "dreamy pop, 90bpm, inspiration",
+    "mood": "dreamy",
+    "theme": "inspiration",
+    "style": "pop",
+    "instruments": [],
+    "tempo": 90,
+    "complexity": "Moderate",
+    "duration": 30,
+    "energy": 5,
+    "filename": "ECHO_IPLE_ace.mp3",
+    "audio_filename": "ECHO_IPLE_ace.mp3",
+    "original_audio_filename": "ECHO_IPLE_ace.mp3",
+    "output_file": "generated/ECHO_IPLE_ace.mp3",
+    "audio_url": "/generated/ECHO_IPLE_ace.mp3",
+    "lyrics": {
+      "text": "[verse]\nLost in the moments, I'm searching for a light\nA guiding star to lead me through the darkest night\nEvery step forward, a chance to rewrite\nA story untold, where I take flight\n\n[chorus]\nI'm chasing the horizon, and the ghosts of my past\nI'm learning to let go, and leave the heartaches vast\nI'm finding my way, through the twists and the turns\nAnd I won't be held back, from the path that I've learned\n\n[verse]\nRiver of memories, flowing like a stream\nWhere the echoes whisper, of the dreams I've seen\nFading like the sun, as the seasons come and go\nBut the love and the laughter, will forever glow\n\n[chorus]\nI'm chasing the horizon, and the ghosts of my past\nI'm learning to let go, and leave the heartaches vast\nI'm finding my way, through the twists and the turns\nAnd I won't be held back, from the path that I've learned\n\n[bridge]\nIn the silence of the night, I hear a gentle voice\nWhispering my name, and a heartfelt choice\nTo rise above the pain, and shine like the morning light\nAnd let the beauty of tomorrow, guide me through the night\n\n[chorus]\nI'm chasing the horizon, and the ghosts of my past\nI'm learning to let go, and leave the heartaches vast\nI'm finding my way, through the twists and the turns\nAnd I won't be held back, from the path that I've learned",
+      "structure": "user-provided"
+    },
+    "copyright": {
+      "status": "safe",
+      "similarity_score": 0.91,
+      "notes": "Appears original.",
+      "matches": [],
+      "risk": "None",
+      "copyright_status": "Unknown",
+      "song_title": "",
+      "artist": "",
+      "details": "No strong evidence of existing lyrics."
+    }
+  }
+]

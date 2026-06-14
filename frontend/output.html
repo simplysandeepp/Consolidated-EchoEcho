@@ -456,23 +456,102 @@
   let song = null;
   let fromLibrary = false;
 
+  function normalizeAudioUrl(value) {
+    if (!value) return '';
+    const url = String(value);
+    if (/^https?:\/\//i.test(url) || url.startsWith('/')) return url;
+    return '/' + url.replace(/^\/+/, '');
+  }
+
+  function parseLyricsSections(text) {
+    const sections = [];
+    let current = null;
+    String(text || '').split(/\r?\n/).forEach((line) => {
+      const trimmed = line.trim();
+      const tag = /^\[([^\]]+)\]$/.exec(trimmed);
+      if (tag) {
+        current = { name: tag[1], lines: [] };
+        sections.push(current);
+      } else if (trimmed) {
+        if (!current) {
+          current = { name: 'Track', lines: [] };
+          sections.push(current);
+        }
+        current.lines.push({ chord: '', text: trimmed });
+      }
+    });
+    return sections.filter((section) => section.lines.length);
+  }
+
+  function normalizeSong(raw) {
+    if (!raw) return null;
+    const audioUrl = normalizeAudioUrl(raw.audio_url || raw.original_audio_url || raw.audio_path || '');
+    const title = raw.title || [raw.mood, raw.theme || raw.genre || raw.style].filter(Boolean).join(' · ') || 'Generated Track';
+    const lyricsText = raw.lyrics && typeof raw.lyrics === 'object' ? raw.lyrics.text : raw.lyrics;
+    let sections = Array.isArray(raw.sections) ? raw.sections : parseLyricsSections(lyricsText);
+    if (!sections.length) {
+      sections = [{ name: audioUrl ? 'Audio' : 'Missing audio', lines: [{ chord: '', text: audioUrl ? 'Studio audio render' : 'Audio file missing for this track' }] }];
+    }
+    return {
+      ...raw,
+      id: String(raw.id || raw.song_id || raw.code || ''),
+      title,
+      genre: raw.genre || raw.style || '',
+      bpm: raw.bpm || raw.tempo || 90,
+      duration: Number(raw.duration || raw.duration_seconds || 0),
+      audio_url: audioUrl,
+      audio_missing: !audioUrl,
+      chords: Array.isArray(raw.chords) && raw.chords.length ? raw.chords : ['Am', 'F', 'C', 'G'],
+      sections,
+      created_at: raw.created_at || raw.date || new Date().toISOString(),
+      date: raw.date || raw.created_at || new Date().toISOString(),
+    };
+  }
+
+  function readServerTrack(trackId) {
+    try {
+      const xhr = new XMLHttpRequest();
+      const path = trackId ? '/song/' + encodeURIComponent(trackId) : '/history';
+      xhr.open('GET', API_BASE + path, false);
+      const token = localStorage.getItem('echo_auth_token');
+      if (token) xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+      xhr.send();
+      if (xhr.status < 200 || xhr.status >= 300) return null;
+      const body = JSON.parse(xhr.responseText || 'null');
+      if (trackId) return normalizeSong(body.song || body);
+      const songs = Array.isArray(body) ? body : (body && Array.isArray(body.songs) ? body.songs : []);
+      return normalizeSong(songs[0]);
+    } catch (e) {
+      return null;
+    }
+  }
+
   (function loadSong() {
     const params = new URLSearchParams(location.search);
     const trackId = params.get('track');
     try {
       if (trackId) {
         const tracks = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
-        song = tracks.find((t) => t.id === trackId) || null;
+        song = normalizeSong(tracks.find((t) => String(t.id) === String(trackId))) || readServerTrack(trackId);
         fromLibrary = !!song;
       }
       if (!song) {
-        song = JSON.parse(localStorage.getItem('echo_current_song') || 'null');
+        song = normalizeSong(JSON.parse(localStorage.getItem('echo_current_song') || 'null'));
         if (song) {
           // generated songs are auto-saved to the library now
           const saved = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
           fromLibrary = Array.isArray(saved) && saved.some((t) => t.id === song.id);
         }
       }
+      if (!song) {
+        const tracks = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
+        if (Array.isArray(tracks) && tracks.length) {
+          tracks.sort((a, b) => new Date(b.created_at || b.date) - new Date(a.created_at || a.date));
+          song = normalizeSong(tracks[0]);
+          fromLibrary = !!song;
+        }
+      }
+      if (!song) song = readServerTrack(null);
     } catch (e) { song = null; }
 
     if (!song || !song.sections || !song.sections.length) {
@@ -522,6 +601,7 @@
         totalSeconds += BAR_SECONDS;
       });
     });
+    if (song.duration && song.duration > totalSeconds) totalSeconds = song.duration;
     renderSong(); // safe here: the timeline (and totalSeconds) exist now
   }
 
@@ -545,6 +625,10 @@
       saveBtn.onclick = () => { window.location.href = 'dashboard.html'; };
     }
     document.getElementById('download-label').textContent = song.audio_url ? 'Download audio' : 'Download lyric sheet';
+    if (song.audio_missing) {
+      document.getElementById('engine-badge').textContent = 'Audio missing';
+      showToast('Audio file missing for this track. Regenerate it to restore playback.');
+    }
     if (song.source && song.source.startsWith('groq/')) {
       document.getElementById('lyrics-source').textContent = '· written by ' + song.source.replace('groq/', '') + ' via Groq';
     }
@@ -810,12 +894,18 @@
   }
 
   function startPlayback() {
+    if (song.audio_missing) {
+      showToast('Audio file missing for this track. Regenerate it to restore playback.');
+      return;
+    }
+
     const ctx = ensureContext();
     if (ctx.state === 'suspended') ctx.resume();
 
     if (song.audio_url) {
       if (!audioEl) {
-        audioEl = new Audio(API_BASE + song.audio_url);
+        const sourceUrl = /^https?:\/\//i.test(song.audio_url) ? song.audio_url : API_BASE + song.audio_url;
+        audioEl = new Audio(sourceUrl);
         audioEl.crossOrigin = 'anonymous';
         audioEl.loop = true; // 30s studio render loops under the full vocal take
         try {
@@ -924,7 +1014,7 @@
     try { tracks = JSON.parse(localStorage.getItem('echo_tracks') || '[]'); } catch (e) { /* fresh */ }
     if (!Array.isArray(tracks)) tracks = [];
     if (!tracks.some((t) => t.id === song.id)) {
-      tracks.unshift(song);
+      tracks.unshift(normalizeSong(song));
       localStorage.setItem('echo_tracks', JSON.stringify(tracks));
     }
     localStorage.removeItem('echo_current_song');
@@ -936,7 +1026,7 @@
   function downloadTrack() {
     if (song.audio_url) {
       const a = document.createElement('a');
-      a.href = API_BASE + song.audio_url;
+      a.href = /^https?:\/\//i.test(song.audio_url) ? song.audio_url : API_BASE + song.audio_url;
       a.download = song.title.replace(/[^a-z0-9 ]/gi, '') + (song.audio_url.endsWith('.mp3') ? '.mp3' : '.wav');
       document.body.appendChild(a); a.click(); a.remove();
       showToast('Downloading instrumental…');

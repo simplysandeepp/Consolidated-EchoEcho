@@ -8,6 +8,7 @@ import httpx
 from fastapi.testclient import TestClient
 
 import backend.main as main
+import backend.auth as auth
 import backend.api_generator as api
 from backend.api_generator import GenerationInput, KieAIConfigError, KieAIResponseError, submit_to_suno, validate_kieai_config
 
@@ -161,6 +162,48 @@ def test_history_and_library_aliases_share_saved_inspirations(tmp_path: Path, mo
         assert body["songs"][0]["original_audio_url"] == "/generated/ECHO_ABCD_original.mp3"
         assert body["songs"][0]["trimmed_audio_url"] is None
         assert body["songs"][0]["download_url"] == "/download/ABCD/original"
+
+
+def test_history_is_scoped_to_authenticated_user(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(main, "USER_DATA_DIR", tmp_path / "users")
+    monkeypatch.setattr(auth, "SESSIONS_FILE", tmp_path / "sessions.json")
+    main.ensure_files()
+
+    token_a = "token-a"
+    token_b = "token-b"
+    auth.SESSIONS_FILE.write_text(
+        json.dumps({token_a: "one@example.com", token_b: "two@example.com"}),
+        encoding="utf-8",
+    )
+
+    main.save_user_song(
+        main.user_id_from_email("one@example.com"),
+        {
+            "song_id": "ABCD",
+            "code": "ABCD",
+            "title": "First User Song",
+            "created_at": "2026-06-09T00:00:00+00:00",
+            "original_audio_filename": "ABCD.wav",
+        },
+    )
+    main.save_user_song(
+        main.user_id_from_email("two@example.com"),
+        {
+            "song_id": "WXYZ",
+            "code": "WXYZ",
+            "title": "Second User Song",
+            "created_at": "2026-06-09T00:00:00+00:00",
+            "original_audio_filename": "WXYZ.wav",
+        },
+    )
+
+    client = TestClient(main.app)
+    first = client.get("/history", headers={"Authorization": f"Bearer {token_a}"}).json()["songs"]
+    second = client.get("/history", headers={"Authorization": f"Bearer {token_b}"}).json()["songs"]
+
+    assert [song["song_id"] for song in first] == ["ABCD"]
+    assert [song["song_id"] for song in second] == ["WXYZ"]
+    assert client.get("/song/WXYZ", headers={"Authorization": f"Bearer {token_a}"}).status_code == 404
 
 
 def test_generate_endpoint_saves_generated_song(tmp_path: Path, monkeypatch) -> None:

@@ -540,6 +540,7 @@
 const sel = { mood: [], genre: [], instrument: [] };
 let duration = 30;
 let lastAudioUrl = null;
+let lastGeneratedTrack = null;
 let pollInterval = null;
 
 /* ─── Multi-select chip (toggle) ───────────────────────── */
@@ -719,6 +720,7 @@ function showResult(data) {
 
   const audioUrl = data.audio_url || data.audio_path || '';
   lastAudioUrl = audioUrl;
+  lastGeneratedTrack = data.song || data.record || null;
 
   player.src = audioUrl;
   dlBtn.href = audioUrl;
@@ -738,23 +740,27 @@ function showResult(data) {
 function saveToLibrary() {
   if (!lastAudioUrl) return;
   const tracks = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
+  const backendTrack = lastGeneratedTrack || {};
   const tempo = document.getElementById('bpm-slider').value;
   const titleParts = [joinSel('mood') || joinSel('genre') || 'Instrumental', joinSel('instrument')].filter(Boolean);
   const newTrack = {
-    id: Date.now(),
+    id: String(backendTrack.id || backendTrack.song_id || backendTrack.code || Date.now()),
     title: titleParts.join(' · ') + ' Track',
     mood: joinSel('mood'),
     genre: joinSel('genre'),
     instrument: joinSel('instrument'),
-    audio_url: lastAudioUrl,
-    created_at: new Date().toISOString(),
-    date: new Date().toISOString(),
+    audio_path: backendTrack.audio_path || '',
+    audio_url: backendTrack.audio_url || lastAudioUrl,
+    created_at: backendTrack.created_at || new Date().toISOString(),
+    date: backendTrack.created_at || new Date().toISOString(),
     mode: 'musicgen',
-    bpm: tempo,
-    duration,
+    bpm: backendTrack.bpm || backendTrack.tempo || tempo,
+    duration: backendTrack.duration || duration,
     color: '#059669',
     emoji: '🎸',
   };
+  const existing = tracks.findIndex(t => String(t.id) === String(newTrack.id));
+  if (existing >= 0) tracks.splice(existing, 1);
   tracks.unshift(newTrack);
   localStorage.setItem('echo_tracks', JSON.stringify(tracks));
   showToast('Saved to your library!');

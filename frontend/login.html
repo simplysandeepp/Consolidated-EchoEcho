@@ -602,8 +602,15 @@
   let authMode='login';
 
   function setAuthMode(mode){
+    if(mode==='signup'){
+      window.location.href=location.protocol==='file:'?'signup.html':'/signup';
+      return;
+    }
     authMode=mode==='signup'?'signup':'login';
     const isSignup=authMode==='signup';
+    if(location.protocol!=='file:'){
+      history.replaceState(null,'',isSignup?'/signup':'/login');
+    }
     document.querySelectorAll('.signup-only').forEach(el=>el.style.display=isSignup?'block':'none');
     document.getElementById('name-row').style.display=isSignup?'grid':'none';
     document.querySelectorAll('.login-only').forEach(el=>el.style.display=isSignup?'none':'flex');
@@ -763,7 +770,7 @@
   });
 
   (async function(){
-    setAuthMode('login');
+    setAuthMode(location.pathname==='/signup'?'signup':'login');
     if(localStorage.getItem('echo_auth_token')){
       window.location.href='dashboard.html';
       return;

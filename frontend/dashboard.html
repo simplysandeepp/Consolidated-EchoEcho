@@ -1054,6 +1054,7 @@ function trackSecs(t){
   return 0;
 }
 function fmtDur(t){
+  if(!trackAudioUrl(t) && !hasLyrics(t)) return 'Audio missing';
   if(typeof t.duration === 'number' && !isNaN(t.duration)){
     const m = Math.floor(t.duration/60), s = Math.round(t.duration%60);
     return m + ':' + String(s).padStart(2,'0');
@@ -1072,6 +1073,36 @@ function humanDate(d){
 }
 function hasLyrics(t){
   return Array.isArray(t.sections) && t.sections.some(s => s && Array.isArray(s.lines) && s.lines.length > 0);
+}
+function normalizeAudioUrl(value){
+  if(!value) return '';
+  const url = String(value);
+  if(/^https?:\/\//i.test(url) || url.startsWith('/')) return url;
+  return '/' + url.replace(/^\/+/, '');
+}
+function trackAudioUrl(t){
+  return normalizeAudioUrl(t.audio_url || t.original_audio_url || t.audio_path || '');
+}
+function resolveAudioUrl(url){
+  if(/^https?:\/\//i.test(url)) return url;
+  return API_BASE + url;
+}
+function normalizeTrack(t){
+  const id = String(t.id || t.song_id || t.code || ('track_' + Date.now()));
+  const audioUrl = trackAudioUrl(t);
+  const duration = Number(t.duration ?? t.duration_seconds ?? t.trimmed_duration_seconds ?? 0);
+  return {
+    ...t,
+    id,
+    title: t.title || [t.mood, t.theme || t.genre || t.style].filter(Boolean).join(' · ') || 'Generated Track',
+    genre: t.genre || t.style || '',
+    bpm: t.bpm || t.tempo || '',
+    duration: Number.isFinite(duration) ? duration : 0,
+    audio_url: audioUrl,
+    audio_path: t.audio_path || (audioUrl.startsWith('/generated/') ? audioUrl.slice(1) : ''),
+    created_at: t.created_at || t.date || new Date().toISOString(),
+    date: t.date || t.created_at || new Date().toISOString(),
+  };
 }
 
 /* ═══════════════════════════════════════════════
@@ -1118,7 +1149,7 @@ function hasLyrics(t){
 
   // load tracks (real library only — no demo data)
   try {
-    tracks = JSON.parse(localStorage.getItem('echo_tracks')) || [];
+    tracks = (JSON.parse(localStorage.getItem('echo_tracks')) || []).map(normalizeTrack);
   } catch(e) {
     tracks = [];
   }
@@ -1126,37 +1157,24 @@ function hasLyrics(t){
 
   renderView();
 
-  // Sync backend history: merge server-side tracks into localStorage so tracks
-  // survive server restarts. CDN URLs (audio_source_url) are preferred.
-  fetch('/history').then(r => r.ok ? r.json() : null).then(data => {
-    if(!data || !Array.isArray(data.songs)) return;
+  // Sync backend history: server records are the source of truth for generated audio.
+  const authToken = localStorage.getItem('echo_auth_token');
+  const authFetchOptions = authToken ? {headers: {'Authorization': 'Bearer ' + authToken}} : {};
+  fetch('/history', authFetchOptions).then(r => r.ok ? r.json() : null).then(data => {
+    const songs = Array.isArray(data) ? data : (data && Array.isArray(data.songs) ? data.songs : []);
+    if(!songs.length) return;
     try {
-      const local = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
-      const localIds = new Set(local.map(t => String(t.id)));
-      let added = 0;
-      for(const song of data.songs) {
-        const id = String(song.song_id || song.code || '');
-        if(!id || localIds.has(id)) continue;
-        const url = song.audio_url || null;
-        if(!url) continue;
-        local.unshift({
-          id,
-          title: [song.mood, song.theme || song.style].filter(Boolean).join(' · ') || 'Generated Track',
-          mood: song.mood || '',
-          genre: song.style || '',
-          bpm: song.tempo || 90,
-          mode: song.mode || 'api',
-          audio_url: url,
-          created_at: song.created_at || new Date().toISOString(),
-        });
-        localIds.add(id);
-        added++;
+      const local = (JSON.parse(localStorage.getItem('echo_tracks') || '[]') || []).map(normalizeTrack);
+      const byId = new Map(local.map(t => [String(t.id), t]));
+      for(const song of songs) {
+        const serverTrack = normalizeTrack(song);
+        if(!serverTrack.id) continue;
+        const existing = byId.get(serverTrack.id) || {};
+        byId.set(serverTrack.id, normalizeTrack({...existing, ...serverTrack, fav: existing.fav || serverTrack.fav}));
       }
-      if(added > 0) {
-        localStorage.setItem('echo_tracks', JSON.stringify(local));
-        tracks = local;
-        renderView();
-      }
+      tracks = Array.from(byId.values()).sort((a,b) => new Date(b.created_at || b.date) - new Date(a.created_at || a.date));
+      localStorage.setItem('echo_tracks', JSON.stringify(tracks));
+      renderView();
     } catch(_){}
   }).catch(()=>{});
 
@@ -1271,6 +1289,7 @@ function renderTracks(filter){
           ${t.genre?`<span class="track-tag genre">${t.genre}</span>`:''}
           ${t.bpm?`<span class="track-tag">${t.bpm} BPM</span>`:''}
           <span class="track-tag">${fmtDur(t)}</span>
+          ${!trackAudioUrl(t)?'<span class="track-tag" style="background:rgba(255,88,88,.08);color:#e04040">Audio missing</span>':''}
           ${hasLyrics(t)?'<span class="track-tag">♪ Lyrics + Chords</span>':''}
           ${t.fav?'<span class="track-tag" style="background:rgba(255,88,88,.08);color:#e04040">♥</span>':''}
         </div>
@@ -1278,10 +1297,10 @@ function renderTracks(filter){
       </div>
       <div class="track-right">
         <span class="track-dur">${fmtDur(t)}</span>
-        <span class="track-date">${humanDate(t.date)}</span>
+        <span class="track-date">${humanDate(t.created_at || t.date)}</span>
       </div>
       <div class="track-actions">
-        <button class="act-btn act-play" onclick="togglePlay('${t.id}',event)" title="Play">
+        <button class="act-btn act-play" onclick="togglePlay('${t.id}',event)" title="${trackAudioUrl(t) ? 'Play' : 'Audio missing'}">
           <svg id="play-icon-${t.id}" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </button>
         <div style="position:relative">
@@ -1357,11 +1376,12 @@ function downloadTrack(id, fmt='mp3'){
   const title = trackTitle(t);
   const safeName = title.replace(/[^\w\- ]+/g,'').trim() || 'track';
 
-  if(t.audio_url){
+  const audioUrl = trackAudioUrl(t);
+  if(audioUrl){
     // real instrumental file from the backend
     const a = document.createElement('a');
-    a.href = API_BASE + t.audio_url;
-    a.download = safeName + '.wav';
+    a.href = resolveAudioUrl(audioUrl);
+    a.download = safeName + (audioUrl.endsWith('.mp3') ? '.mp3' : '.wav');
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -1427,6 +1447,7 @@ function deleteTrack(id){
 }
 
 function saveTracks(){
+  tracks = tracks.map(normalizeTrack);
   localStorage.setItem('echo_tracks', JSON.stringify(tracks));
 }
 
@@ -1813,7 +1834,10 @@ async function startVocalGeneration(){
   try {
     const res = await fetch('/api/kie-vocal', {
       method: 'POST',
-      headers: {'Content-Type':'application/json'},
+      headers: {
+        'Content-Type':'application/json',
+        ...(localStorage.getItem('echo_auth_token') ? {'Authorization':'Bearer ' + localStorage.getItem('echo_auth_token')} : {})
+      },
       body: JSON.stringify(payload),
     });
     clearInterval(pollTimer);
@@ -1829,20 +1853,11 @@ async function startVocalGeneration(){
     setGenUI('🎉 Song ready!', 100);
 
     // Save track to localStorage library
-    const track = data.track;
-    const libraryTrack = {
-      id: track.song_id || track.code,
-      title: `${track.mood || ''} ${track.theme || track.genre || 'Song'}`.trim(),
-      mood: track.mood || payload.mood,
-      genre: track.genre || payload.genre,
-      bpm: track.bpm || payload.bpm,
-      mode: 'kie-vocal',
-      // Prefer CDN URL (audio_source_url) so playback survives server restarts
-      audio_url: track.audio_source_url || track.audio_url || null,
-      created_at: track.created_at || new Date().toISOString(),
-    };
+    const libraryTrack = normalizeTrack({...data.track, genre: data.track.genre || payload.genre});
     try {
-      const lib = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
+      const lib = (JSON.parse(localStorage.getItem('echo_tracks') || '[]') || []).map(normalizeTrack);
+      const idx = lib.findIndex(t => t.id === libraryTrack.id);
+      if(idx >= 0) lib.splice(idx, 1);
       lib.unshift(libraryTrack);
       localStorage.setItem('echo_tracks', JSON.stringify(lib));
       tracks = lib;
@@ -1960,12 +1975,16 @@ function showToast(msg){
 
   window.togglePlay = function(id, e){
     e.stopPropagation();
-    const t = tracks.find(t => t.id === id);
+    const t = tracks.find(t => String(t.id) === String(id));
     if(!t) return;
 
-    if(!t.audio_url){ openTrack(id); return; }
+    const audioUrl = trackAudioUrl(t);
+    if(!audioUrl){
+      showToast('Audio file missing for this track. Regenerate it to restore playback.');
+      return;
+    }
 
-    const url = (window.API_BASE || '') + t.audio_url;
+    const url = resolveAudioUrl(audioUrl);
 
     if(currentId === id){
       mpToggle();
@@ -1976,7 +1995,7 @@ function showToast(msg){
     currentId = id;
     audio.src = url;
     audio.load();
-    audio.play().catch(()=>{});
+    audio.play().catch(() => showToast('Playback could not start. Check that the audio file is available.'));
     icon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
     document.querySelectorAll('[id^="play-icon-"]').forEach(el => el.innerHTML='<polygon points="5,3 19,12 5,21"/>');
     const ic = document.getElementById('play-icon-'+id);

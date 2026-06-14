@@ -39,13 +39,14 @@
       --gradient:linear-gradient(0.351turn,#ff5858 23.71%,#c058ff 78.8%);
       --gradient-text:linear-gradient(135deg,#ff5858 0%,#c058ff 100%);
       --shadow-box:0px 2.5px 6px rgba(0,0,0,.05),0px 10px 50px rgba(0,0,0,.04),0px 0px 2.5px rgba(0,0,0,.15);
+      --shadow-nav:0px 2px 5px rgba(0,0,0,.05),0px 8px 40px rgba(0,0,0,.04),0px 0px 2px rgba(0,0,0,.15);
     }
 
     .page{display:flex;height:100vh;overflow:hidden}
 
     /* ── Left panel ─────────────────────────────────────── */
     .left-panel{
-      width:48%;height:100%;background:var(--dark);
+      width:50%;height:100%;background:var(--dark);
       position:relative;overflow:hidden;
       display:flex;flex-direction:column;padding:2.5rem;flex-shrink:0;
     }
@@ -96,9 +97,10 @@
     /* ── Right panel ────────────────────────────────────── */
     .right-panel{
       flex:1;height:100%;overflow-y:auto;
-      background:#fff;display:flex;flex-direction:column;
-      align-items:center;justify-content:center;
+      background:rgba(255,255,255,.72);display:flex;flex-direction:column;
+      align-items:center;justify-content:flex-start;
       padding:2rem;position:relative;
+      scrollbar-gutter:stable;
     }
     .back-link{
       position:absolute;top:2rem;left:2rem;
@@ -107,19 +109,45 @@
       text-decoration:none;transition:color .15s;
     }
     .back-link:hover{color:var(--dark)}
+    .back-link svg{transition:transform .15s}
+    .back-link:hover svg{transform:translateX(-2px)}
 
     .auth-card{
-      width:100%;max-width:400px;
-      animation:fade-up .5s cubic-bezier(.2,.75,.28,.9) both;
+      width:100%;max-width:500px;
+      margin:0 auto;padding:1.5rem 0 2rem;
+      animation:fade-up .6s cubic-bezier(.2,.75,.28,.9) both;
     }
-    .auth-card-logo{display:flex;align-items:center;gap:.5rem;margin-bottom:1.75rem}
-    .auth-card-logo-icon{width:32px;height:32px;border-radius:9px;background:var(--gradient);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .auth-card-logo-icon svg{width:16px;height:16px}
-    .auth-card-wordmark{font-size:1rem;font-weight:800;letter-spacing:-.03em;color:var(--dark)}
+    .auth-card-logo{display:flex;align-items:center;gap:.5rem;justify-content:center;margin-bottom:1.5rem}
+    .auth-card-logo-icon{width:36px;height:36px;border-radius:10px;background:var(--gradient);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .auth-card-logo-icon svg{width:18px;height:18px}
+    .auth-card-wordmark{font-size:1.1rem;font-weight:800;letter-spacing:-.03em;color:var(--dark)}
     .auth-card-wordmark em{font-style:normal;background:var(--gradient-text);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 
-    .auth-heading{font-size:1.6rem;font-weight:800;letter-spacing:-.04em;color:var(--dark);margin-bottom:.3rem}
-    .auth-sub{font-size:.9rem;color:var(--grey71);margin-bottom:1.5rem;line-height:1.5}
+    .auth-tabs{
+      background:rgba(13,13,13,.05);border-radius:9999px;
+      padding:.188rem .375rem;display:flex;position:relative;
+      width:100%;margin-bottom:1.75rem;
+    }
+    .auth-tab{
+      z-index:1;position:relative;cursor:pointer;
+      font-weight:600;font-size:.9rem;height:2.625rem;
+      color:var(--dark);flex:1;text-align:center;text-decoration:none;
+      border:none;background:transparent;border-radius:9999px;
+      font-family:'Inter',sans-serif;transition:color .15s;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .auth-tab-indicator{
+      position:absolute;left:.375rem;top:5px;
+      height:calc(100% - 10px);
+      width:calc(50% - .375rem);
+      background:#fff;border-radius:9999px;
+      box-shadow:var(--shadow-nav);
+      transform:translateX(100%);
+      z-index:0;
+    }
+
+    .auth-heading{font-size:1.75rem;font-weight:800;letter-spacing:-.04em;color:var(--dark);text-align:center;margin-bottom:.5rem}
+    .auth-sub{font-size:.9rem;color:var(--grey71);text-align:center;margin-bottom:1.75rem;line-height:1.5}
 
     .auth-msg{
       border-radius:12px;padding:.75rem 1rem;font-size:.85rem;font-weight:500;
@@ -129,64 +157,65 @@
     .auth-msg.success{background:rgba(46,204,113,.08);color:#1a7a45;border:1px solid rgba(46,204,113,.2);display:block}
 
     .social-btn{
-      width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;
-      padding:.75rem 1rem;border-radius:12px;
-      font-family:'Inter',sans-serif;font-size:.9rem;font-weight:600;
-      cursor:pointer;border:none;transition:opacity .15s,transform .1s;
-      margin-bottom:.625rem;
+      width:100%;height:52px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;gap:.625rem;
+      font-family:'Inter',sans-serif;font-size:.9375rem;font-weight:600;
+      cursor:pointer;border:none;transition:all .15s;
+      position:relative;overflow:hidden;margin-bottom:.75rem;
     }
-    .btn-google{background:#fff;color:var(--dark);border:1.5px solid rgba(13,13,13,.12)}
-    .btn-google:hover{background:#fafafa}
+    .btn-google{background:#fff;color:var(--dark);border:1.5px solid rgba(13,13,13,.12);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+    .btn-google:hover{background:var(--greyF4);border-color:rgba(13,13,13,.18)}
     .btn-apple{background:var(--dark);color:#fff}
     .btn-apple:hover{opacity:.88}
     .btn-apple:active,.btn-google:active{transform:scale(.98)}
 
-    .auth-divider{display:flex;align-items:center;gap:.75rem;margin:.75rem 0}
+    .auth-divider{display:flex;align-items:center;gap:.875rem;margin:1rem 0}
     .auth-divider-line{flex:1;height:1px;background:rgba(13,13,13,.08)}
-    .auth-divider-text{font-size:.78rem;color:var(--grey71);white-space:nowrap}
+    .auth-divider-text{font-size:.8rem;color:var(--grey71);font-weight:500;white-space:nowrap}
 
     .name-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
     .input-group{margin-bottom:.875rem}
     .input-label{display:block;font-size:.8rem;font-weight:600;color:var(--dark);margin-bottom:.4rem}
     .auth-input{
-      width:100%;padding:.72rem 1rem;
-      background:var(--greyF4);border:1.5px solid transparent;
-      border-radius:12px;font-family:'Inter',sans-serif;font-size:.9rem;
-      color:var(--dark);outline:none;transition:border-color .2s,background .2s;
+      width:100%;height:48px;border-radius:10px;
+      border:1.5px solid rgba(13,13,13,.1);
+      background:#fff;padding:0 1rem;
+      font-family:'Inter',sans-serif;font-size:.9375rem;
+      color:var(--dark);outline:none;transition:border-color .15s,box-shadow .15s;
     }
-    .auth-input:focus{border-color:rgba(192,88,255,.4);background:#fff}
-    .auth-input::placeholder{color:rgba(13,13,13,.3)}
+    .auth-input:focus{border-color:rgba(13,13,13,.4);box-shadow:0 0 0 3px rgba(13,13,13,.06)}
+    .auth-input::placeholder{color:rgba(13,13,13,.25)}
     .pw-wrap{position:relative}
     .pw-toggle{
-      position:absolute;right:.75rem;top:50%;transform:translateY(-50%);
-      background:none;border:none;cursor:pointer;color:var(--grey71);padding:.25rem;
+      position:absolute;right:.875rem;top:50%;transform:translateY(-50%);
+      background:none;border:none;cursor:pointer;color:var(--grey71);padding:0;
       display:flex;align-items:center;
     }
     .pw-toggle:hover{color:var(--dark)}
 
     .bl-dark-btn{
-      width:100%;padding:.85rem;border-radius:12px;
+      position:relative;width:100%;height:52px;
       background:var(--dark);color:#fff;
-      font-family:'Inter',sans-serif;font-size:.95rem;font-weight:700;
-      border:none;cursor:pointer;margin-top:.25rem;
-      position:relative;overflow:hidden;
-      transition:opacity .15s,transform .1s;
+      font-family:'Inter',sans-serif;font-size:.9375rem;font-weight:600;
+      border:none;cursor:pointer;margin-top:1rem;
+      border-radius:9999px;display:flex;align-items:center;justify-content:center;
+      overflow:hidden;
     }
-    .bl-dark-btn::before{content:'';position:absolute;inset:0;background:var(--gradient);opacity:0;transition:opacity .2s}
+    .bl-dark-btn::before{content:'';position:absolute;inset:0;background:var(--dark);border-radius:9999px;transition:transform .12s ease;z-index:0}
     .bl-dark-btn span{position:relative;z-index:1}
-    .bl-dark-btn:hover::before{opacity:1}
-    .bl-dark-btn:active{transform:scale(.98)}
-    .bl-dark-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .bl-dark-btn:hover::before{transform:scaleX(1.031) scaleY(1.051)}
+    .bl-dark-btn:active{transform:scale(.97)}
+    .bl-dark-btn:disabled{opacity:.6;cursor:default}
 
     .auth-terms{
-      font-size:.75rem;color:var(--grey71);text-align:center;
-      margin-top:1rem;line-height:1.5;
+      font-size:.75rem;color:rgba(13,13,13,.35);text-align:center;
+      margin-top:1.25rem;line-height:1.6;
     }
-    .auth-terms a{color:var(--dark);text-decoration:none;font-weight:500}
-    .auth-terms a:hover{text-decoration:underline}
+    .auth-terms a{color:rgba(13,13,13,.5);text-decoration:underline;font-weight:500}
+    .auth-terms a:hover{color:var(--dark)}
 
     .auth-toggle-footer{
-      text-align:center;font-size:.875rem;color:var(--grey71);margin-top:1.25rem;
+      text-align:center;font-size:.875rem;color:var(--grey71);margin-top:1rem;
     }
     .auth-toggle-footer a{color:var(--dark);font-weight:600;text-decoration:none}
     .auth-toggle-footer a:hover{text-decoration:underline}
@@ -213,10 +242,16 @@
     .success-login-btn span{position:relative;z-index:1}
     .success-login-btn:hover::before{opacity:1}
 
-    @media(max-width:700px){
-      .left-panel{display:none}
-      .right-panel{justify-content:flex-start;padding-top:3rem}
+    @media(max-width:768px){
+      .page{flex-direction:column}
+      .left-panel{width:100%;height:auto;min-height:220px;padding:1.5rem}
+      .left-content{padding-right:0}
+      .left-title{font-size:1.75rem}
+      .frog-stage,.left-perks{display:none}
+      .right-panel{padding:2rem 1.25rem;justify-content:flex-start;padding-top:2.5rem}
+      .auth-card{max-width:500px;padding-top:2.5rem}
       .back-link{top:1.25rem;left:1.25rem}
+      .left-sub{display:none}
     }
   </style>
 </head>
@@ -286,6 +321,12 @@
         <span class="auth-card-wordmark">Echo <em>Echo</em></span>
       </div>
 
+      <div class="auth-tabs">
+        <div class="auth-tab-indicator"></div>
+        <a class="auth-tab" href="login.html">Log in</a>
+        <span class="auth-tab">Sign up</span>
+      </div>
+
       <!-- Form state -->
       <div id="form-state">
         <h1 class="auth-heading">Create your account</h1>
@@ -293,7 +334,7 @@
 
         <div class="auth-msg" id="auth-msg"></div>
 
-        <button class="social-btn btn-google" onclick="showSocialMsg()">
+        <button class="social-btn btn-google" onclick="handleGoogle()">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <path d="M17.64 9.20455C17.64 8.56636 17.5827 7.95273 17.4764 7.36364H9V10.845H13.8436C13.635 11.97 13.0009 12.9232 12.0477 13.5614V15.8195H14.9564C16.6582 14.2527 17.64 11.9455 17.64 9.20455Z" fill="#4285F4"/>
             <path d="M9 18C11.43 18 13.4673 17.1941 14.9564 15.8195L12.0477 13.5614C11.2418 14.1014 10.2109 14.4205 9 14.4205C6.65591 14.4205 4.67182 12.8373 3.96409 10.71H0.957275V13.0418C2.43818 15.9832 5.48182 18 9 18Z" fill="#34A853"/>
@@ -303,7 +344,7 @@
           Sign up with Google
         </button>
 
-        <button class="social-btn btn-apple" onclick="showSocialMsg()">
+        <button class="social-btn btn-apple" onclick="handleApple()">
           <svg width="17" height="20" viewBox="0 0 24 24" fill="white">
             <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
           </svg>
@@ -391,8 +432,40 @@
   </div>
 </div>
 
-<script>
-  const API_BASE = location.protocol === 'file:' ? 'http://127.0.0.1:8000' : '';
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+  import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-analytics.js";
+  import {
+    getAuth,
+    setPersistence,
+    browserLocalPersistence,
+    createUserWithEmailAndPassword,
+    signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult,
+    GoogleAuthProvider,
+    OAuthProvider,
+    updateProfile
+  } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+
+  async function loadFirebaseConfig() {
+    const apiBase = location.protocol === 'file:' ? 'http://127.0.0.1:8000' : '';
+    const response = await fetch(apiBase + '/api/firebase-config', { cache: 'no-store' });
+    if (!response.ok) throw new Error('Firebase configuration is unavailable.');
+    return response.json();
+  }
+
+  const firebaseConfig = await loadFirebaseConfig();
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const authReady = setPersistence(auth, browserLocalPersistence);
+  const googleProvider = new GoogleAuthProvider();
+  const appleProvider = new OAuthProvider('apple.com');
+  googleProvider.setCustomParameters({ prompt: 'select_account' });
+  appleProvider.setCustomParameters({ locale: 'en' });
+  isSupported().then((supported) => {
+    if (supported) getAnalytics(app);
+  }).catch(() => {});
 
   function showMsg(text, type) {
     const el = document.getElementById('auth-msg');
@@ -405,16 +478,58 @@
     el.textContent = '';
   }
 
-  function showSocialMsg() {
-    showMsg('Social sign-in is coming soon — please sign up with email.', 'error');
-  }
-
   function togglePw(inputId, eyeId) {
     const input = document.getElementById(inputId);
     input.type = input.type === 'password' ? 'text' : 'password';
   }
 
-  async function handleSignup(e) {
+
+  function firebaseMessage(error) {
+    const code = error && error.code ? error.code : '';
+    const messages = {
+      'auth/account-exists-with-different-credential': 'An account already exists with this email. Try the original sign-in method.',
+      'auth/email-already-in-use': 'An account with this email already exists.',
+      'auth/invalid-email': 'Please enter a valid email address.',
+      'auth/invalid-credential': 'Invalid email or password.',
+      'auth/operation-not-allowed': 'This sign-up method is not enabled for this Firebase project.',
+      'auth/popup-blocked': 'Popup was blocked. Redirecting to sign-up...',
+      'auth/popup-closed-by-user': 'Sign-up was cancelled.',
+      'auth/weak-password': 'Password must be at least 6 characters.'
+    };
+    return messages[code] || 'Sign-up failed. Please try again.';
+  }
+
+  async function finishFirebaseAuth(user, msg) {
+    const token = await user.getIdToken();
+    const email = user.email || '';
+    const fallbackName = email ? email.split('@')[0].replace(/[._-]+/g, ' ') : 'Music Creator';
+    localStorage.setItem('echo_auth_token', token);
+    localStorage.setItem('echo_user_name', user.displayName || fallbackName);
+    localStorage.setItem('echo_user_email', email);
+    showMsg(msg, 'success');
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 700);
+  }
+
+  async function handleFirebaseProvider(provider) {
+    hideMsg();
+    try {
+      await authReady;
+      const result = await signInWithPopup(auth, provider);
+      await finishFirebaseAuth(result.user, 'Account ready! Redirecting...');
+    } catch (err) {
+      if (err && ['auth/popup-blocked', 'auth/popup-closed-by-user', 'auth/cancelled-popup-request'].includes(err.code)) {
+        showMsg(firebaseMessage(err), 'error');
+        await signInWithRedirect(auth, provider);
+        return;
+      }
+      showMsg(firebaseMessage(err), 'error');
+    }
+  }
+
+  async function handleGoogle() { await handleFirebaseProvider(googleProvider); }
+  async function handleApple() { await handleFirebaseProvider(appleProvider); }
+
+  async function handleFirebaseSignup(e) {
     e.preventDefault();
     hideMsg();
 
@@ -432,39 +547,43 @@
     const btn = document.getElementById('submit-btn');
     const span = document.getElementById('submit-text');
     btn.disabled = true;
-    span.textContent = 'Creating account…';
-
-    const name = [firstName, lastName].filter(Boolean).join(' ');
+    span.textContent = 'Creating account...';
 
     try {
-      const res = await fetch(API_BASE + '/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password: pw }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        showMsg(err.detail || 'Sign-up failed. Please try again.', 'error');
-        return;
-      }
-
-      // Success — redirect to avatar picker
-      localStorage.setItem('echo_pending_email', email);
-      setTimeout(() => { window.location.href = 'pick-avatar.html'; }, 600);
-
+      await authReady;
+      const name = [firstName, lastName].filter(Boolean).join(' ');
+      const result = await createUserWithEmailAndPassword(auth, email, pw);
+      if (name) await updateProfile(result.user, { displayName: name });
+      await finishFirebaseAuth(result.user, 'Account created! Redirecting...');
     } catch (err) {
-      showMsg('Network error — check your connection and try again.', 'error');
+      showMsg(firebaseMessage(err), 'error');
     } finally {
       btn.disabled = false;
       span.textContent = 'Create account';
     }
   }
 
+  Object.assign(window, {
+    togglePw,
+    handleSignup: handleFirebaseSignup,
+    handleGoogle,
+    handleApple
+  });
+
   // Redirect already-logged-in users to dashboard
   if (localStorage.getItem('echo_auth_token')) {
     window.location.href = 'dashboard.html';
   }
+
+  (async function () {
+    try {
+      await authReady;
+      const result = await getRedirectResult(auth);
+      if (result && result.user) await finishFirebaseAuth(result.user, 'Account ready! Redirecting...');
+    } catch (err) {
+      showMsg(firebaseMessage(err), 'error');
+    }
+  })();
 </script>
 <script src="wave-bg.js"></script>
 </body>

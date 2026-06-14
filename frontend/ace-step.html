@@ -297,7 +297,16 @@
     @keyframes floatNote{0%{opacity:0;transform:translateY(0) scale(.8)}35%{opacity:1}100%{opacity:0;transform:translateY(-2.2em) scale(1.15)}}
 
     /* ── WAVEFORM VISUAL ────────────────────────────── */
-    .wave-visual{display:none}
+    .wave-visual{
+      height:48px;margin:1rem auto;
+      display:flex;align-items:center;justify-content:center;gap:4px;
+    }
+    .wave-bar{
+      width:4px;border-radius:9999px;
+      background:var(--gradient);
+      transform-origin:center;
+      animation:wave-bar .7s ease-in-out infinite alternate;
+    }
 
     /* ── ERROR ────────────────────────────────────────── */
     #error-box{
@@ -592,6 +601,7 @@
         <div class="music-note note-3">♩</div>
       </div>
       <div class="progress-title">Composing your track...</div>
+      <div class="wave-visual" id="gen-wave"></div>
       <div class="progress-sub" id="progress-sub">Connecting to ACE-Step model</div>
       <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar"></div></div>
     </div>
@@ -642,6 +652,7 @@ const sel = { mood: [], genre: [], instruments: [], vocal: [] };
 let duration = 30;
 let lastAudioUrl = null;
 let lastPromptTags = [];
+let lastGeneratedTrack = null;
 
 /* ─── Auth guard ───────────────────────────────────────── */
 (function(){
@@ -747,14 +758,24 @@ function clearLyrics() {
 /* ─── Wave visual during generation ───────────────────── */
 function buildWave() {
   const w = document.getElementById('gen-wave');
+  if (!w) {
+    console.error('gen-wave element not found');
+    return;
+  }
+
   w.innerHTML = '';
+
   for (let i = 0; i < 24; i++) {
     const b = document.createElement('div');
     b.className = 'wave-bar';
+
     const h = 8 + Math.random() * 32;
     const dur = (0.4 + Math.random() * 0.8).toFixed(2);
     const dly = (Math.random() * 0.8).toFixed(2);
-    b.style.cssText = `height:${h}px;animation-duration:${dur}s;animation-delay:${dly}s`;
+
+    b.style.cssText =
+      `height:${h}px;animation-duration:${dur}s;animation-delay:${dly}s`;
+
     w.appendChild(b);
   }
 }
@@ -896,6 +917,7 @@ function showResult(data, prompt) {
 
   const audioUrl = data.audio_url || data.audio_path || '';
   lastAudioUrl = audioUrl;
+  lastGeneratedTrack = data.song || data.record || null;
 
   player.src = audioUrl;
   dlBtn.href = audioUrl;
@@ -915,16 +937,21 @@ function showResult(data, prompt) {
 function saveToLibrary() {
   if (!lastAudioUrl) return;
   const tracks = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
+  const backendTrack = lastGeneratedTrack || {};
   const newTrack = {
-    id: Date.now(),
+    id: String(backendTrack.id || backendTrack.song_id || backendTrack.code || Date.now()),
     title: (sel.mood[0] || sel.genre[0] || 'ACE-Step') + ' · Vocal Track',
-    prompt: lastPromptTags.join(', '),
-    audio_url: lastAudioUrl,
-    created_at: new Date().toISOString(),
+    genre: backendTrack.genre || backendTrack.style || sel.genre.join(', '),
+    prompt: backendTrack.prompt || lastPromptTags.join(', '),
+    audio_path: backendTrack.audio_path || '',
+    audio_url: backendTrack.audio_url || lastAudioUrl,
+    created_at: backendTrack.created_at || new Date().toISOString(),
     mode: 'ace-step',
-    bpm: document.getElementById('bpm-slider').value,
-    duration,
+    bpm: backendTrack.bpm || backendTrack.tempo || document.getElementById('bpm-slider').value,
+    duration: backendTrack.duration || duration,
   };
+  const existing = tracks.findIndex(t => String(t.id) === String(newTrack.id));
+  if (existing >= 0) tracks.splice(existing, 1);
   tracks.unshift(newTrack);
   localStorage.setItem('echo_tracks', JSON.stringify(tracks));
   alert('Saved to your library!');

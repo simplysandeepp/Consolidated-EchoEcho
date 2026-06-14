@@ -15,12 +15,14 @@ from threading import Lock
 
 BASE_DIR = Path(__file__).resolve().parent
 USERS_FILE = BASE_DIR / "users.json"
+SESSIONS_FILE = BASE_DIR / "sessions.json"
 
 DEMO_EMAIL = "test@echo.com"
 DEMO_PASSWORD = "test@123"
 DEMO_NAME = "Echo Tester"
 
 _users_lock = Lock()
+_sessions_lock = Lock()
 
 
 class AuthError(ValueError):
@@ -52,12 +54,41 @@ def _read_users() -> dict[str, dict[str, str]]:
     return data
 
 
+def _read_sessions() -> dict[str, str]:
+    if not SESSIONS_FILE.exists():
+        SESSIONS_FILE.write_text("{}", encoding="utf-8")
+        return {}
+    try:
+        data = json.loads(SESSIONS_FILE.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except json.JSONDecodeError:
+        return {}
+
+
+def _write_sessions(sessions: dict[str, str]) -> None:
+    SESSIONS_FILE.write_text(json.dumps(sessions, indent=2), encoding="utf-8")
+
+
 def _issue_session(email: str, name: str) -> dict[str, object]:
+    token = secrets.token_hex(24)
+    with _sessions_lock:
+        sessions = _read_sessions()
+        sessions[token] = email
+        _write_sessions(sessions)
     return {
         "ok": True,
-        "token": secrets.token_hex(24),
+        "token": token,
         "user": {"name": name, "email": email},
     }
+
+
+def user_email_for_token(token: str) -> str | None:
+    cleaned = token.strip()
+    if not cleaned:
+        return None
+    with _sessions_lock:
+        email = _read_sessions().get(cleaned)
+    return email.strip().lower() if email else None
 
 
 def login(email: str, password: str) -> dict[str, object]:
