@@ -91,6 +91,7 @@ def generate_with_ace_step(
     client = Client(
         ACE_SPACE,
         headers={"Authorization": f"Bearer {HF_TOKEN}"} if HF_TOKEN else {},
+        httpx_kwargs={"timeout": 300.0},
     )
 
     ace_prompt = _build_prompt(mood or prompt, style, instruments or [], tempo, energy)

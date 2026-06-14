@@ -836,8 +836,11 @@ async function generate() {
   const token = localStorage.getItem('echo_auth_token');
 
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 360000); // 6 min timeout
     const res = await fetch('/generate', {
       method: 'POST',
+      signal: controller.signal,
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({
         prompt,
@@ -852,6 +855,7 @@ async function generate() {
       }),
     });
 
+    clearTimeout(timeout);
     if (!res.ok) {
       const err = await res.json().catch(() => ({ detail: res.statusText }));
       throw new Error(err.detail || 'Generation failed');
@@ -868,10 +872,13 @@ async function generate() {
     endProgress(false);
     progressSection.style.display = 'none';
     const msg = err.message || '';
+    const isTimeout = err.name === 'AbortError';
     const isHfDown = /ACE-Step|gradio|HuggingFace|Space/i.test(msg);
-    errorBox.textContent = isHfDown
-      ? 'ACE-Step is currently unavailable — the HuggingFace Space may be sleeping. Please try again in a few minutes, or use the Kie.ai vocal generator instead.'
-      : 'Error: ' + msg;
+    errorBox.textContent = isTimeout
+      ? 'ACE-Step timed out — music generation can take up to 5 minutes. Please try again.'
+      : isHfDown
+        ? 'ACE-Step is currently unavailable — the HuggingFace Space may be sleeping. Please try again in a few minutes.'
+        : 'Error: ' + msg;
     errorBox.style.display = 'block';
   } finally {
     btn.classList.remove('loading');

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
@@ -687,7 +688,7 @@ async def generate_with_ace_step_mode(request: GenerateRequest) -> dict[str, Any
             lyrics_text = lyrics_result.get("text", "")
 
         update_generation_status("Sending to ACE-Step (this may take a few minutes)", 35)
-        ace_result = generate_with_ace_step(
+        ace_result = await asyncio.to_thread(generate_with_ace_step,
             prompt=prompt_str,
             lyrics=lyrics_text,
             duration=request.duration or 30,
