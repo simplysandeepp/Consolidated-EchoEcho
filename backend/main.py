@@ -937,6 +937,14 @@ def docs_page() -> FileResponse:
     return FileResponse(path, media_type="text/html")
 
 
+@app.get("/docs/{path:path}", include_in_schema=False)
+def docs_subpage(path: str) -> FileResponse:
+    doc = FRONTEND_DIR / "docs.html"
+    if not doc.exists():
+        raise HTTPException(status_code=404, detail="Docs page not found.")
+    return FileResponse(doc, media_type="text/html")
+
+
 @app.get("/")
 def serve_frontend() -> FileResponse:
     index_path = FRONTEND_DIR / "index.html"
