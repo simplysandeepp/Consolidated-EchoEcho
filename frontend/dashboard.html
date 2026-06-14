@@ -1126,6 +1126,40 @@ function hasLyrics(t){
 
   renderView();
 
+  // Sync backend history: merge server-side tracks into localStorage so tracks
+  // survive server restarts. CDN URLs (audio_source_url) are preferred.
+  fetch('/history').then(r => r.ok ? r.json() : null).then(data => {
+    if(!data || !Array.isArray(data.songs)) return;
+    try {
+      const local = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
+      const localIds = new Set(local.map(t => String(t.id)));
+      let added = 0;
+      for(const song of data.songs) {
+        const id = String(song.song_id || song.code || '');
+        if(!id || localIds.has(id)) continue;
+        const url = song.audio_url || null;
+        if(!url) continue;
+        local.unshift({
+          id,
+          title: [song.mood, song.theme || song.style].filter(Boolean).join(' · ') || 'Generated Track',
+          mood: song.mood || '',
+          genre: song.style || '',
+          bpm: song.tempo || 90,
+          mode: song.mode || 'api',
+          audio_url: url,
+          created_at: song.created_at || new Date().toISOString(),
+        });
+        localIds.add(id);
+        added++;
+      }
+      if(added > 0) {
+        localStorage.setItem('echo_tracks', JSON.stringify(local));
+        tracks = local;
+        renderView();
+      }
+    } catch(_){}
+  }).catch(()=>{});
+
   // auto-open Create Inspo wizard (flag set by other pages)
   if(localStorage.getItem('echo_open_create')){
     localStorage.removeItem('echo_open_create');
@@ -1803,7 +1837,8 @@ async function startVocalGeneration(){
       genre: track.genre || payload.genre,
       bpm: track.bpm || payload.bpm,
       mode: 'kie-vocal',
-      audio_url: track.audio_url || null,
+      // Prefer CDN URL (audio_source_url) so playback survives server restarts
+      audio_url: track.audio_source_url || track.audio_url || null,
       created_at: track.created_at || new Date().toISOString(),
     };
     try {

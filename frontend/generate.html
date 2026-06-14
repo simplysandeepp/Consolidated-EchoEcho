@@ -693,6 +693,10 @@
   async function generateInstrumental() {
     try {
       const health = await fetchJSON(API_BASE + '/health');
+      if (health.status === 'error') {
+        setSub('MusicGen is unavailable on this deployment — your track will use the live synth engine instead.');
+        return null;
+      }
       if (health.status !== 'ready') {
         setSub('The MusicGen studio engine is still warming up — your track will use the live synth engine instead.');
         return null;

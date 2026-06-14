@@ -410,7 +410,14 @@ def with_urls(record: dict[str, Any]) -> dict[str, Any]:
     code = record_code(record)
     original = original_filename(record)
     trimmed = trimmed_filename(record)
-    original_url = f"/generated/{original}" if original else None
+    source_url = record.get("audio_source_url") or None
+
+    local_original_exists = original and (GENERATED_DIR / original).exists()
+    original_url = f"/generated/{original}" if local_original_exists else source_url
+
+    local_trimmed_exists = trimmed and (GENERATED_DIR / trimmed).exists()
+    trimmed_url = f"/generated/{trimmed}" if local_trimmed_exists else None
+
     return {
         **record,
         "code": code,
@@ -421,7 +428,7 @@ def with_urls(record: dict[str, Any]) -> dict[str, Any]:
         "original_audio_url": original_url,
         "original_download_url": f"/download/{code}/original" if code else None,
         "download_url": f"/download/{code}/original" if code else None,
-        "trimmed_audio_url": f"/generated/{trimmed}" if trimmed else None,
+        "trimmed_audio_url": trimmed_url,
         "trimmed_download_url": f"/download/{code}/trimmed" if trimmed else None,
     }
 
@@ -601,7 +608,12 @@ def generate_with_musicgen(request: GenerateRequest) -> dict[str, Any]:
 
     if current_status != "ready" or ready_model is None or ready_processor is None:
         update_generation_status("Failed", 100)
-        raise HTTPException(status_code=503, detail="MusicGen is still loading.")
+        detail = (
+            "MusicGen is unavailable on this deployment — it requires a GPU and is not installed."
+            if current_status == "error"
+            else "MusicGen is still loading, please try again in a moment."
+        )
+        raise HTTPException(status_code=503, detail=detail)
 
     try:
         custom_prompt = request.custom_prompt.strip() or request.prompt.strip()
@@ -731,7 +743,11 @@ async def generate_with_ace_step_mode(request: GenerateRequest) -> dict[str, Any
     except Exception as exc:
         update_generation_status("Failed", 100)
         logger.exception("ACE-Step generation failed")
-        raise HTTPException(status_code=500, detail=f"ACE-Step generation failed: {exc}") from exc
+        detail = (
+            f"ACE-Step HuggingFace Space is unavailable — it may be sleeping. "
+            f"Try again in a few minutes. ({exc})"
+        )
+        raise HTTPException(status_code=500, detail=detail) from exc
 
 
 @app.post("/api/auth/login")

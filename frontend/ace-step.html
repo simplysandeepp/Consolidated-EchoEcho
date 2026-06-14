@@ -867,7 +867,11 @@ async function generate() {
   } catch(err) {
     endProgress(false);
     progressSection.style.display = 'none';
-    errorBox.textContent = 'Error: ' + err.message;
+    const msg = err.message || '';
+    const isHfDown = /ACE-Step|gradio|HuggingFace|Space/i.test(msg);
+    errorBox.textContent = isHfDown
+      ? 'ACE-Step is currently unavailable — the HuggingFace Space may be sleeping. Please try again in a few minutes, or use the Kie.ai vocal generator instead.'
+      : 'Error: ' + msg;
     errorBox.style.display = 'block';
   } finally {
     btn.classList.remove('loading');

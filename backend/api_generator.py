@@ -266,6 +266,7 @@ async def generate_song(
         **asdict(data),
         "prompt": prompt,
         "original_audio_filename": original_audio_filename,
+        "audio_source_url": audio_url,
         "trimmed_audio_filename": None,
     }
     logger.info(
@@ -385,5 +386,6 @@ async def generate_vocal_song(
         "created_at": datetime.now(timezone.utc).isoformat(),
         **asdict(data),
         "original_audio_filename": original_audio_filename,
+        "audio_source_url": audio_url,
         "trimmed_audio_filename": trimmed_audio_filename,
     }
