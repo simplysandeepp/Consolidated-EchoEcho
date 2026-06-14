@@ -41,6 +41,7 @@ from .transcriber import TranscriptionError, transcribe_audio
 from .agents.lyrics_agent import generate_lyrics as generate_agent_lyrics
 from .agents.copyright_agent.main import check_copyright
 from .agents.copyright_agent.models.request_model import CopyrightCheckRequest
+from .ace_step_generator import generate_with_ace_step
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -336,8 +337,8 @@ def add_agent_sections(record: dict[str, Any], request: GenerateRequest, prompt:
 
 def normalize_mode(value: str | None) -> str:
     mode = (value or "musicgen").strip().lower()
-    if mode not in {"api", "musicgen"}:
-        raise HTTPException(status_code=400, detail="Unknown generation mode. Use 'api' or 'musicgen'.")
+    if mode not in {"api", "musicgen", "ace-step"}:
+        raise HTTPException(status_code=400, detail="Unknown generation mode. Use 'api', 'musicgen', or 'ace-step'.")
     return mode
 
 
@@ -636,6 +637,70 @@ def generate_with_musicgen(request: GenerateRequest) -> dict[str, Any]:
     return unified_response(record)
 
 
+async def generate_with_ace_step_mode(request: GenerateRequest) -> dict[str, Any]:
+    reset_generation_status(600)
+    update_generation_status("Generating lyrics for ACE-Step", 10)
+    try:
+        song_id = create_song_id("mp3")
+        filename = f"ECHO_{song_id}_ace.mp3"
+        output_path = GENERATED_DIR / filename
+
+        mood = first_or_join(request.moods or ([request.mood] if request.mood else []), "dreamy")
+        theme = first_or_join(request.themes or ([request.theme] if request.theme else []), "inspiration")
+        style = first_or_join(request.genres or ([request.style] if request.style else []), "pop")
+        prompt_str = f"{mood} {style}, {request.tempo}bpm, {theme}"
+
+        update_generation_status("Writing lyrics", 20)
+        lyrics_result, lyrics_ok = generate_lyrics_section(request, prompt_str)
+        lyrics_text = lyrics_result.get("text", "")
+
+        update_generation_status("Sending to ACE-Step (this may take a few minutes)", 35)
+        ace_result = generate_with_ace_step(
+            prompt=prompt_str,
+            lyrics=lyrics_text,
+            duration=request.duration or 30,
+            mood=mood,
+            style=style,
+            instruments=request.instruments,
+            tempo=request.tempo,
+            energy=request.energy,
+            output_path=output_path,
+        )
+
+        update_generation_status("Checking copyright", 90)
+        copyright_result = generate_copyright_section(lyrics_text, lyrics_ok)
+
+        record: dict[str, Any] = {
+            "mode": "ace-step",
+            "code": song_id,
+            "song_id": song_id,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "prompt": prompt_str,
+            "mood": mood,
+            "theme": theme,
+            "style": style,
+            "instruments": request.instruments,
+            "tempo": request.tempo,
+            "complexity": request.complexity,
+            "duration": request.duration,
+            "energy": request.energy,
+            "filename": filename,
+            "audio_filename": filename,
+            "original_audio_filename": filename,
+            "output_file": f"generated/{filename}",
+            "audio_url": f"/generated/{filename}",
+            "lyrics": lyrics_result,
+            "copyright": copyright_result,
+        }
+        append_history(record)
+        update_generation_status("Completed", 100)
+        return unified_response(record)
+    except Exception as exc:
+        update_generation_status("Failed", 100)
+        logger.exception("ACE-Step generation failed")
+        raise HTTPException(status_code=500, detail=f"ACE-Step generation failed: {exc}") from exc
+
+
 @app.post("/api/auth/login")
 def api_auth_login(request: LoginRequest) -> dict[str, Any]:
     try:
@@ -679,6 +744,8 @@ async def generate(request: GenerateRequest) -> dict[str, Any]:
     mode = normalize_mode(request.mode)
     if mode == "api":
         return await generate_with_api(request)
+    if mode == "ace-step":
+        return await generate_with_ace_step_mode(request)
     return generate_with_musicgen(request)
 
 

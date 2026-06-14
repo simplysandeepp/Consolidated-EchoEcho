@@ -12,5 +12,7 @@ services:
         sync: false # paste your Kie.AI key in the Render dashboard
       - key: PUBLIC_BASE_URL
         value: https://consolidated-echoecho.onrender.com
+      - key: HF_TOKEN
+        sync: false
       - key: PYTHON_VERSION
         value: 3.12.6

@@ -10,3 +10,4 @@ pydub==0.25.1
 # audioop-lts intentionally omitted: it only exists for Python 3.13+,
 # and the deploy pins Python 3.12 where audioop is still in the stdlib.
 python-multipart==0.0.20
+gradio_client>=1.3.0

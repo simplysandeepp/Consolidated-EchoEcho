@@ -412,6 +412,18 @@
 <main class="page">
   <div class="container">
 
+    <!-- Mode toggle -->
+    <div id="mode-toggle" style="display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:1.25rem">
+      <button id="btn-instrumental" onclick="setMode('musicgen')"
+        style="padding:.45rem 1.1rem;border-radius:20px;border:1.5px solid #0d0d0d;background:#0d0d0d;color:#fff;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s">
+        🎵 Instrumental
+      </button>
+      <button id="btn-vocals" onclick="setMode('ace-step')"
+        style="padding:.45rem 1.1rem;border-radius:20px;border:1.5px solid #d9d9d9;background:#fff;color:#717171;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s">
+        🎤 With Vocals (ACE-Step)
+      </button>
+    </div>
+
     <!-- 1. Inspo Pills Row -->
     <div class="pills-row" id="pills-row">
       <!-- populated by JS -->
@@ -532,6 +544,24 @@
 
   /* ── Backend base URL ───────────────────────────────── */
   const API_BASE = location.protocol === 'file:' ? 'http://127.0.0.1:8000' : '';
+
+  /* ── Generation mode (instrumental vs vocals) ───────── */
+  let selectedMode = localStorage.getItem('echo_gen_mode') || 'musicgen';
+  function setMode(mode) {
+    selectedMode = mode;
+    localStorage.setItem('echo_gen_mode', mode);
+    const isVocal = mode === 'ace-step';
+    document.getElementById('btn-instrumental').style.background = isVocal ? '#fff' : '#0d0d0d';
+    document.getElementById('btn-instrumental').style.color = isVocal ? '#717171' : '#fff';
+    document.getElementById('btn-instrumental').style.borderColor = isVocal ? '#d9d9d9' : '#0d0d0d';
+    document.getElementById('btn-vocals').style.background = isVocal ? '#0d0d0d' : '#fff';
+    document.getElementById('btn-vocals').style.color = isVocal ? '#fff' : '#717171';
+    document.getElementById('btn-vocals').style.borderColor = isVocal ? '#0d0d0d' : '#d9d9d9';
+    if (isVocal) {
+      document.getElementById('status-sub').textContent = 'Generating lyrics then sending to ACE-Step for vocal synthesis…';
+    }
+  }
+  setMode(selectedMode); // apply saved state on load
 
   /* ── Headline cycling ───────────────────────────────── */
   const HEADLINES = [
@@ -701,7 +731,7 @@
         signal: instrumentalAbort.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          mode: 'musicgen',
+          mode: selectedMode,
           duration: 30,
           moods: inspo.mood ? [inspo.mood] : [],
           genres: inspo.genre ? [inspo.genre] : [],
