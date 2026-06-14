@@ -829,11 +829,13 @@ async def kie_vocal_generate(request: KieVocalRequest) -> dict[str, Any]:
             extra_prompt=request.promptText,
         )
 
-        filename = generated.get("original_audio_filename")
+        trimmed = generated.get("trimmed_audio_filename")
+        original = generated.get("original_audio_filename")
+        serve_file = trimmed or original
         generated["mode"] = "kie-vocal"
-        generated["filename"] = filename
-        generated["audio_filename"] = filename
-        generated["audio_url"] = f"/generated/{filename}" if filename else None
+        generated["filename"] = serve_file
+        generated["audio_filename"] = serve_file
+        generated["audio_url"] = f"/generated/{serve_file}" if serve_file else None
         generated["genre"] = request.genre
         generated["mood_tag"] = request.mood
         generated["bpm"] = request.bpm

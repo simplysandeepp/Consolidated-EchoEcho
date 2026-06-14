@@ -363,6 +363,17 @@ async def generate_vocal_song(
             raise RuntimeError("KieAI completed but did not provide an audio URL.")
         await download_audio(client, audio_url, original_file)
 
+    # Trim to 60 seconds
+    trimmed_audio_filename = f"ECHO_{code}_vocal_60s.mp3"
+    trimmed_file = generated_dir / trimmed_audio_filename
+    try:
+        trim_audio(original_file, trimmed_file, duration_seconds=60)
+        logger.info("Trimmed vocal to 60s: %s", trimmed_file)
+    except Exception as exc:
+        logger.warning("Trim failed, using original: %s", exc)
+        trimmed_audio_filename = None
+        trimmed_file = None
+
     logger.info(
         "Vocal generation done code=%s task_id=%s file=%s total=%.2fs",
         code, task_id, original_file, time.perf_counter() - total_started,
@@ -374,5 +385,5 @@ async def generate_vocal_song(
         "created_at": datetime.now(timezone.utc).isoformat(),
         **asdict(data),
         "original_audio_filename": original_audio_filename,
-        "trimmed_audio_filename": None,
+        "trimmed_audio_filename": trimmed_audio_filename,
     }

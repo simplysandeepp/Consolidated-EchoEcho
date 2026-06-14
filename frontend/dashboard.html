@@ -491,6 +491,35 @@
     .gen-cancel:hover{color:var(--dark)}
     @keyframes frogDance{0%{transform:translateY(0) rotate(-4deg)}100%{transform:translateY(-12px) rotate(4deg)}}
 
+    /* ── Mini Player Bar ────────────────────────────────── */
+    .mini-player{
+      position:fixed;bottom:0;left:0;right:0;z-index:9999;
+      background:#0d0d0d;border-top:1px solid rgba(255,255,255,.08);
+      display:flex;align-items:center;gap:1rem;
+      padding:.75rem 1.5rem;
+      transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.75,.28,.9);
+    }
+    .mini-player.open{transform:translateY(0)}
+    .mp-info{flex:1;min-width:0}
+    .mp-track-name{font-size:.82rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mp-track-sub{font-size:.68rem;color:rgba(255,255,255,.4);margin-top:.1rem}
+    .mp-play-pause{
+      width:40px;height:40px;border-radius:50%;flex-shrink:0;
+      background:linear-gradient(135deg,#ff5858,#c058ff);
+      border:none;cursor:pointer;color:#fff;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 4px 14px rgba(255,88,88,.4);transition:transform .15s;
+    }
+    .mp-play-pause:hover{transform:scale(1.08)}
+    .mp-play-pause svg{width:14px;height:14px;fill:#fff}
+    .mp-progress-wrap{flex:2;min-width:80px}
+    .mp-prog{width:100%;height:3px;background:rgba(255,255,255,.12);border-radius:2px;cursor:pointer;appearance:none;-webkit-appearance:none;outline:none}
+    .mp-prog::-webkit-slider-thumb{appearance:none;width:10px;height:10px;border-radius:50%;background:#fff;cursor:pointer;box-shadow:0 0 4px rgba(255,88,88,.8)}
+    .mp-prog::-webkit-slider-runnable-track{background:linear-gradient(to right,#ff5858 var(--pct,0%),rgba(255,255,255,.12) var(--pct,0%));border-radius:2px;height:3px}
+    .mp-time-lbl{font-size:.62rem;color:rgba(255,255,255,.35);font-weight:600;white-space:nowrap;flex-shrink:0}
+    .mp-close{background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;font-size:1.1rem;padding:0;flex-shrink:0;transition:color .15s}
+    .mp-close:hover{color:#fff}
+
     /* ── Responsive ─────────────────────────────────────── */
     @media(max-width:640px){
       .nav{padding:0 1rem}
@@ -1254,10 +1283,8 @@ function openTrack(id){
   window.location.href = 'output.html?track=' + encodeURIComponent(id);
 }
 
-function togglePlay(id, e){
-  e.stopPropagation();
-  openTrack(id);
-}
+// togglePlay is defined in the mini-player script below; this is the fallback
+window.togglePlay = window.togglePlay || function(id, e){ e.stopPropagation(); openTrack(id); };
 
 /* ═══════════════════════════════════════════════
    MORE MENU
@@ -1833,6 +1860,101 @@ function showToast(msg){
       if(card && !card.contains(e.relatedTarget)) card.style.transform='rotateX(0) rotateY(0) translateZ(0)';
     });
   })();
+</script>
+
+<!-- ── MINI PLAYER ─────────────────────────────── -->
+<div class="mini-player" id="mini-player">
+  <button class="mp-play-pause" id="mp-play-pause" onclick="mpToggle()">
+    <svg id="mp-icon" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+  </button>
+  <div class="mp-info">
+    <div class="mp-track-name" id="mp-track-name">—</div>
+    <div class="mp-track-sub" id="mp-track-sub"></div>
+  </div>
+  <span class="mp-time-lbl" id="mp-time-lbl">0:00 / 0:00</span>
+  <input type="range" class="mp-prog" id="mp-prog" min="0" max="100" value="0" step="0.1" oninput="mpSeek(this.value)"/>
+  <button class="mp-close" onclick="mpClose()" title="Close">✕</button>
+</div>
+<audio id="mp-audio"></audio>
+
+<script>
+(function(){
+  const audio = document.getElementById('mp-audio');
+  const player = document.getElementById('mini-player');
+  const prog = document.getElementById('mp-prog');
+  const timeLbl = document.getElementById('mp-time-lbl');
+  const icon = document.getElementById('mp-icon');
+  let currentId = null;
+
+  function fmt(s){ const m=Math.floor(s/60); return m+':'+(Math.floor(s%60)+'').padStart(2,'0'); }
+
+  audio.addEventListener('timeupdate', () => {
+    if(!audio.duration) return;
+    const pct = (audio.currentTime / audio.duration) * 100;
+    prog.value = pct;
+    prog.style.setProperty('--pct', pct + '%');
+    timeLbl.textContent = fmt(audio.currentTime) + ' / ' + fmt(audio.duration);
+  });
+
+  audio.addEventListener('ended', () => {
+    icon.innerHTML = '<polygon points="5,3 19,12 5,21"/>';
+    if(currentId) { const ic=document.getElementById('play-icon-'+currentId); if(ic) ic.innerHTML='<polygon points="5,3 19,12 5,21"/>'; }
+  });
+
+  window.togglePlay = function(id, e){
+    e.stopPropagation();
+    const t = tracks.find(t => t.id === id);
+    if(!t) return;
+
+    if(!t.audio_url){ openTrack(id); return; }
+
+    const url = (window.API_BASE || '') + t.audio_url;
+
+    if(currentId === id){
+      mpToggle();
+      return;
+    }
+
+    // New track
+    currentId = id;
+    audio.src = url;
+    audio.load();
+    audio.play().catch(()=>{});
+    icon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+    document.querySelectorAll('[id^="play-icon-"]').forEach(el => el.innerHTML='<polygon points="5,3 19,12 5,21"/>');
+    const ic = document.getElementById('play-icon-'+id);
+    if(ic) ic.innerHTML='<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+
+    document.getElementById('mp-track-name').textContent = t.title || (t.mood+' '+t.genre) || 'Track';
+    document.getElementById('mp-track-sub').textContent = [t.genre, t.bpm ? t.bpm+' BPM' : ''].filter(Boolean).join(' · ');
+    prog.value = 0; prog.style.setProperty('--pct','0%');
+    player.classList.add('open');
+  };
+
+  window.mpToggle = function(){
+    if(audio.paused){
+      audio.play();
+      icon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+      if(currentId){ const ic=document.getElementById('play-icon-'+currentId); if(ic) ic.innerHTML='<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'; }
+    } else {
+      audio.pause();
+      icon.innerHTML = '<polygon points="5,3 19,12 5,21"/>';
+      if(currentId){ const ic=document.getElementById('play-icon-'+currentId); if(ic) ic.innerHTML='<polygon points="5,3 19,12 5,21"/>'; }
+    }
+  };
+
+  window.mpSeek = function(val){
+    if(audio.duration) audio.currentTime = (val/100)*audio.duration;
+  };
+
+  window.mpClose = function(){
+    audio.pause();
+    audio.src = '';
+    currentId = null;
+    player.classList.remove('open');
+    document.querySelectorAll('[id^="play-icon-"]').forEach(el => el.innerHTML='<polygon points="5,3 19,12 5,21"/>');
+  };
+})();
 </script>
 </body>
 </html>
