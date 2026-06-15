@@ -244,7 +244,9 @@
       transition:border-color .15s,box-shadow .15s;
       animation:fade-up .45s cubic-bezier(.2,.75,.28,.9) both;
       cursor:pointer;
+      position:relative;z-index:0;
     }
+    .track-card.menu-open{z-index:20}
     .track-card:hover{
       border-color:rgba(13,13,13,.14);
       box-shadow:0 4px 24px rgba(0,0,0,.05);
@@ -1363,10 +1365,14 @@ function toggleMoreMenu(id, e){
   const m = document.getElementById('more-'+id);
   const wasOpen = m.classList.contains('open');
   closeAllMenus();
-  if(!wasOpen) m.classList.add('open');
+  if(!wasOpen){
+    m.classList.add('open');
+    m.closest('.track-card')?.classList.add('menu-open');
+  }
 }
 function closeAllMenus(){
   document.querySelectorAll('.more-menu.open').forEach(m=>m.classList.remove('open'));
+  document.querySelectorAll('.track-card.menu-open').forEach(card=>card.classList.remove('menu-open'));
 }
 
 function downloadTrack(id, fmt='mp3'){
