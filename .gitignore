@@ -57,3 +57,5 @@ backend/users.json
 # Runtime data (generated on first run)
 backend/song_history.json
 backend/kiai_callbacks.json
+
+genrated-output
