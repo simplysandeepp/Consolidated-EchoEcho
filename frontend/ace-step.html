@@ -225,10 +225,6 @@
       padding:1.75rem;
       position:relative;overflow:hidden;
     }
-    .result-card::before{
-      content:'';position:absolute;top:0;left:0;right:0;height:3px;
-      background:var(--gradient);
-    }
     .result-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem}
     .result-icon{
       width:40px;height:40px;border-radius:12px;background:var(--gradient);
@@ -612,7 +608,6 @@
     <!-- Result -->
     <div id="result-section">
       <div class="result-card">
-        <div class="result-card" style="box-shadow:none;border:none;padding:0">
           <div class="result-header">
             <div class="result-icon">🎤</div>
             <div>
@@ -639,7 +634,6 @@
               Generate Again
             </button>
           </div>
-        </div>
       </div>
     </div>
 

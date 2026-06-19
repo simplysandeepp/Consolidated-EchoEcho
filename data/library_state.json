@@ -8,7 +8,18 @@
         "IPLE",
         "GXID",
         "UDFC",
-        "TXRT"
+        "TXRT",
+        "WXYZ",
+        "QFAU",
+        "ZRGV",
+        "AXGV"
+      ]
+    },
+    "one@example.com": {
+      "name": "One",
+      "email": "one@example.com",
+      "songIds": [
+        "ABCD"
       ]
     }
   },
@@ -72,9 +83,17 @@
       ],
       "key": "D",
       "lyrics": null,
+      "timeSignature": "4/4",
+      "chordSheet": "",
+      "musicSheet": null,
       "displayTitle": "Song GXID",
       "songId": "GXID",
       "audioUrl": "/generated/ECHO_GXID_vocal.mp3",
+      "fileUrl": "/generated/ECHO_GXID_vocal.mp3",
+      "generatedAudioUrl": "/generated/ECHO_GXID_vocal.mp3",
+      "musicgenUrl": null,
+      "aceAudioUrl": null,
+      "mp3Url": "/generated/ECHO_GXID_vocal.mp3",
       "original_audio_url": "/generated/ECHO_GXID_vocal.mp3",
       "original_download_url": "/api/song/GXID/audio",
       "download_url": "/api/song/GXID/audio",
@@ -83,7 +102,22 @@
       "trimmed_download_url": null,
       "ownerEmail": "test@echo.com",
       "provider": "KIE.AI",
-      "musicSheet": [
+      "durationSeconds": 60,
+      "duration_seconds": 60,
+      "lengthSeconds": 60,
+      "BPM": 90,
+      "beatsPerMinute": 90,
+      "isInstrumental": null,
+      "instrumental": null,
+      "vocalsEnabled": null,
+      "vocalMode": "",
+      "chord_sheet": "",
+      "music_sheet": null,
+      "sheetMusic": null,
+      "sheetMusicPdfUrl": "",
+      "musicSheetPdfUrl": "",
+      "sheet_music_pdf_url": "",
+      "musicSheetLines": [
         "0:00-0:10 soft intro that states the mood clearly",
         "0:10-0:35 main melodic idea over the core progression",
         "0:35-0:55 fuller arrangement with Synth, Violin, Flute",
@@ -168,9 +202,17 @@
         "G"
       ],
       "key": "F",
+      "timeSignature": "4/4",
+      "chordSheet": "",
+      "musicSheet": null,
       "displayTitle": "Song UDFC",
       "songId": "UDFC",
       "audioUrl": "/generated/ECHO_UDFC_ace.mp3",
+      "fileUrl": "/generated/ECHO_UDFC_ace.mp3",
+      "generatedAudioUrl": "/generated/ECHO_UDFC_ace.mp3",
+      "musicgenUrl": null,
+      "aceAudioUrl": "/generated/ECHO_UDFC_ace.mp3",
+      "mp3Url": "/generated/ECHO_UDFC_ace.mp3",
       "original_audio_url": "/generated/ECHO_UDFC_ace.mp3",
       "original_download_url": "/api/song/UDFC/audio",
       "download_url": "/api/song/UDFC/audio",
@@ -179,7 +221,22 @@
       "trimmed_download_url": null,
       "ownerEmail": "test@echo.com",
       "provider": "Ace AI",
-      "musicSheet": [
+      "durationSeconds": 30,
+      "duration_seconds": 30,
+      "lengthSeconds": 30,
+      "BPM": 90,
+      "beatsPerMinute": 90,
+      "isInstrumental": null,
+      "instrumental": null,
+      "vocalsEnabled": null,
+      "vocalMode": "",
+      "chord_sheet": "",
+      "music_sheet": null,
+      "sheetMusic": null,
+      "sheetMusicPdfUrl": "",
+      "musicSheetPdfUrl": "",
+      "sheet_music_pdf_url": "",
+      "musicSheetLines": [
         "0:00-0:10 soft intro that states the mood clearly",
         "0:10-0:35 main melodic idea over the core progression",
         "0:35-0:55 fuller arrangement with strings",
@@ -198,7 +255,7 @@
       "mood": "dreamy",
       "theme": "",
       "style": "",
-      "instruments": [],
+      "instruments": "",
       "tempo": 68,
       "complexity": "Moderate",
       "duration": 30,
@@ -253,9 +310,17 @@
         "G"
       ],
       "key": "C",
+      "timeSignature": "4/4",
+      "chordSheet": "",
+      "musicSheet": null,
       "displayTitle": "Song TXRT",
       "songId": "TXRT",
       "audioUrl": "/generated/TXRT.wav",
+      "fileUrl": "/generated/TXRT.wav",
+      "generatedAudioUrl": "/generated/TXRT.wav",
+      "musicgenUrl": "/generated/TXRT.wav",
+      "aceAudioUrl": null,
+      "mp3Url": null,
       "original_audio_url": "/generated/TXRT.wav",
       "original_download_url": "/api/song/TXRT/audio",
       "download_url": "/api/song/TXRT/audio",
@@ -264,7 +329,22 @@
       "trimmed_download_url": null,
       "ownerEmail": "test@echo.com",
       "provider": "MusicGen",
-      "musicSheet": [
+      "durationSeconds": 30,
+      "duration_seconds": 30,
+      "lengthSeconds": 30,
+      "BPM": 68,
+      "beatsPerMinute": 68,
+      "isInstrumental": null,
+      "instrumental": null,
+      "vocalsEnabled": null,
+      "vocalMode": "",
+      "chord_sheet": "",
+      "music_sheet": null,
+      "sheetMusic": null,
+      "sheetMusicPdfUrl": "",
+      "musicSheetPdfUrl": "",
+      "sheet_music_pdf_url": "",
+      "musicSheetLines": [
         "0:00-0:10 soft intro that states the mood clearly",
         "0:10-0:35 main melodic idea over the core progression",
         "0:35-0:55 fuller arrangement with lead melody, chords, bass, and light rhythm",
@@ -283,7 +363,7 @@
       "mood": "dreamy",
       "theme": "inspiration",
       "style": "pop",
-      "instruments": [],
+      "instruments": "",
       "tempo": 90,
       "complexity": "Moderate",
       "duration": 30,
@@ -314,7 +394,7 @@
         "mood": "dreamy",
         "genre": "pop",
         "bpm": 90,
-        "key": "D",
+        "key": "G",
         "chords": [
           "Am",
           "Fmaj7",
@@ -341,7 +421,10 @@
         "C",
         "G"
       ],
-      "key": "D",
+      "key": "G",
+      "timeSignature": "4/4",
+      "chordSheet": "",
+      "musicSheet": null,
       "id": "IPLE",
       "title": "Song IPLE",
       "displayTitle": "Song IPLE",
@@ -350,6 +433,11 @@
       "songId": "IPLE",
       "audio_path": "generated/ECHO_IPLE_ace.mp3",
       "audioUrl": "/generated/ECHO_IPLE_ace.mp3",
+      "fileUrl": "/generated/ECHO_IPLE_ace.mp3",
+      "generatedAudioUrl": "/generated/ECHO_IPLE_ace.mp3",
+      "musicgenUrl": null,
+      "aceAudioUrl": "/generated/ECHO_IPLE_ace.mp3",
+      "mp3Url": "/generated/ECHO_IPLE_ace.mp3",
       "original_audio_url": "/generated/ECHO_IPLE_ace.mp3",
       "original_download_url": "/api/song/IPLE/audio",
       "download_url": "/api/song/IPLE/audio",
@@ -358,7 +446,22 @@
       "trimmed_download_url": null,
       "ownerEmail": "test@echo.com",
       "provider": "Ace AI",
-      "musicSheet": [
+      "durationSeconds": 30,
+      "duration_seconds": 30,
+      "lengthSeconds": 30,
+      "BPM": 90,
+      "beatsPerMinute": 90,
+      "isInstrumental": null,
+      "instrumental": null,
+      "vocalsEnabled": null,
+      "vocalMode": "",
+      "chord_sheet": "",
+      "music_sheet": null,
+      "sheetMusic": null,
+      "sheetMusicPdfUrl": "",
+      "musicSheetPdfUrl": "",
+      "sheet_music_pdf_url": "",
+      "musicSheetLines": [
         "0:00-0:10 soft intro that states the mood clearly",
         "0:10-0:35 main melodic idea over the core progression",
         "0:35-0:55 fuller arrangement with lead melody, chords, bass, and light rhythm",
@@ -427,9 +530,17 @@
       ],
       "key": "G",
       "lyrics": null,
+      "timeSignature": "4/4",
+      "chordSheet": "",
+      "musicSheet": null,
       "displayTitle": "Calm, Cool \u00b7 Fantasy, Mountain",
       "songId": "VGOV",
       "audioUrl": "/generated/ECHO_VGOV_vocal_60s.mp3",
+      "fileUrl": "/generated/ECHO_VGOV_vocal_60s.mp3",
+      "generatedAudioUrl": "/generated/ECHO_VGOV_vocal_60s.mp3",
+      "musicgenUrl": null,
+      "aceAudioUrl": null,
+      "mp3Url": "/generated/ECHO_VGOV_vocal_60s.mp3",
       "original_audio_url": "/generated/ECHO_VGOV_vocal.mp3",
       "original_download_url": "/api/song/VGOV/audio",
       "download_url": "/api/song/VGOV/audio",
@@ -438,7 +549,22 @@
       "trimmed_download_url": "/download/VGOV/trimmed",
       "ownerEmail": "test@echo.com",
       "provider": "KIE.AI",
-      "musicSheet": [
+      "durationSeconds": 214,
+      "duration_seconds": 214,
+      "lengthSeconds": 214,
+      "BPM": 80,
+      "beatsPerMinute": 80,
+      "isInstrumental": null,
+      "instrumental": null,
+      "vocalsEnabled": null,
+      "vocalMode": "",
+      "chord_sheet": "",
+      "music_sheet": null,
+      "sheetMusic": null,
+      "sheetMusicPdfUrl": "",
+      "musicSheetPdfUrl": "",
+      "sheet_music_pdf_url": "",
+      "musicSheetLines": [
         "0:00-0:10 soft intro that states the mood clearly",
         "0:10-0:35 main melodic idea over the core progression",
         "0:35-0:55 fuller arrangement with Piano, Flute",
@@ -447,6 +573,973 @@
       ],
       "lyricsSheetDownloadUrl": null,
       "createdAt": "2026-06-19T10:16:56.736164+00:00"
+    },
+    "ABCD": {
+      "song_id": "ABCD",
+      "code": "ABCD",
+      "title": "First User Song",
+      "created_at": "2026-06-09T00:00:00+00:00",
+      "original_audio_filename": "ABCD.wav",
+      "sheet": {
+        "title": "First User Song",
+        "provider": "MusicGen",
+        "mood": "Selected mood",
+        "genre": "Selected style",
+        "bpm": 90,
+        "key": "Bb",
+        "chords": [
+          "C",
+          "Am",
+          "F",
+          "G"
+        ],
+        "musicSheet": [
+          "0:00-0:10 soft intro that states the mood clearly",
+          "0:10-0:35 main melodic idea over the core progression",
+          "0:35-0:55 fuller arrangement with lead melody, chords, bass, and light rhythm",
+          "Main chord movement: C - Am - F - G",
+          "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+        ]
+      },
+      "sheetAvailable": true,
+      "lyricsAvailable": false,
+      "chords": [
+        "C",
+        "Am",
+        "F",
+        "G"
+      ],
+      "key": "Bb",
+      "timeSignature": "4/4",
+      "chordSheet": "CHORD SHEET\nKey: Bb \u00b7 BPM: 90 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel selected mood and let the Selected style groove breathe.",
+      "musicSheet": {
+        "title": "First User Song",
+        "key": "Bb",
+        "bpm": 90,
+        "timeSignature": "4/4",
+        "scale": "Bb major/minor modal color",
+        "mood": "Selected mood",
+        "genre": "Selected style",
+        "melodySketch": [
+          "Bar 1: B - D# - G# - D#",
+          "Bar 2: C# - D# - F#",
+          "Bar 3: G# - F# - D# - C#"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using C, Am, F, G",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the selected mood mood with piano/synth, bass, drums, and lead texture"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "id": "ABCD",
+      "genre": "",
+      "bpm": 90,
+      "duration": 0,
+      "audio_url": "",
+      "lyrics": null,
+      "displayTitle": "First User Song",
+      "songId": "ABCD",
+      "filename": "ABCD.wav",
+      "audio_filename": "ABCD.wav",
+      "audio_path": "generated/ABCD.wav",
+      "audioUrl": "",
+      "fileUrl": null,
+      "generatedAudioUrl": null,
+      "musicgenUrl": null,
+      "aceAudioUrl": null,
+      "mp3Url": null,
+      "original_audio_url": null,
+      "original_download_url": null,
+      "download_url": null,
+      "downloadAudioUrl": null,
+      "trimmed_audio_url": null,
+      "trimmed_download_url": null,
+      "ownerEmail": "one@example.com",
+      "provider": "MusicGen",
+      "durationSeconds": 0,
+      "duration_seconds": 0,
+      "lengthSeconds": 0,
+      "mood": "",
+      "BPM": 90,
+      "beatsPerMinute": 90,
+      "instruments": "",
+      "isInstrumental": null,
+      "instrumental": null,
+      "vocalsEnabled": null,
+      "vocalMode": "",
+      "chord_sheet": "CHORD SHEET\nKey: Bb \u00b7 BPM: 90 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel selected mood and let the Selected style groove breathe.",
+      "music_sheet": {
+        "title": "First User Song",
+        "key": "Bb",
+        "bpm": 90,
+        "timeSignature": "4/4",
+        "scale": "Bb major/minor modal color",
+        "mood": "Selected mood",
+        "genre": "Selected style",
+        "melodySketch": [
+          "Bar 1: B - D# - G# - D#",
+          "Bar 2: C# - D# - F#",
+          "Bar 3: G# - F# - D# - C#"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using C, Am, F, G",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the selected mood mood with piano/synth, bass, drums, and lead texture"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "sheetMusic": {
+        "title": "First User Song",
+        "key": "Bb",
+        "bpm": 90,
+        "timeSignature": "4/4",
+        "scale": "Bb major/minor modal color",
+        "mood": "Selected mood",
+        "genre": "Selected style",
+        "melodySketch": [
+          "Bar 1: B - D# - G# - D#",
+          "Bar 2: C# - D# - F#",
+          "Bar 3: G# - F# - D# - C#"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using C, Am, F, G",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the selected mood mood with piano/synth, bass, drums, and lead texture"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "sheetMusicPdfUrl": "",
+      "musicSheetPdfUrl": "",
+      "sheet_music_pdf_url": "",
+      "musicSheetLines": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with lead melody, chords, bass, and light rhythm",
+        "Main chord movement: C - Am - F - G",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ],
+      "lyricsSheetDownloadUrl": null,
+      "createdAt": "2026-06-09T00:00:00+00:00"
+    },
+    "WXYZ": {
+      "code": "WXYZ",
+      "song_id": "WXYZ",
+      "task_id": "task_fake",
+      "created_at": "2026-06-09T00:00:00+00:00",
+      "mood": "Calm",
+      "theme": "Hope",
+      "style": "Piano",
+      "instruments": [
+        "Piano"
+      ],
+      "tempo": 90,
+      "energy": 3,
+      "prompt": "fake prompt",
+      "original_audio_filename": "ECHO_WXYZ_original.mp3",
+      "trimmed_audio_filename": null,
+      "mode": "api",
+      "fast": false,
+      "filename": "ECHO_WXYZ_original.mp3",
+      "audio_filename": "ECHO_WXYZ_original.mp3",
+      "id": "WXYZ",
+      "title": "Inspiration WXYZ",
+      "genre": "Piano",
+      "bpm": 90,
+      "duration": 30,
+      "durationSeconds": 30,
+      "duration_seconds": 30,
+      "audio_path": "generated/ECHO_WXYZ_original.mp3",
+      "audio_url": "/generated/ECHO_WXYZ_original.mp3",
+      "audioUrl": "/generated/ECHO_WXYZ_original.mp3",
+      "output_file": "generated/ECHO_WXYZ_original.mp3",
+      "lyrics": null,
+      "copyright": {
+        "status": "unavailable",
+        "similarity_score": null,
+        "notes": "No real lyrics were returned for this KIE.AI inspiration.",
+        "matches": []
+      },
+      "sheet": {
+        "title": "Inspiration WXYZ",
+        "provider": "KIE.AI",
+        "mood": "Calm",
+        "genre": "Piano",
+        "bpm": 90,
+        "key": "F",
+        "chords": [
+          "C",
+          "Am",
+          "F",
+          "G"
+        ],
+        "musicSheet": [
+          "0:00-0:10 soft intro that states the mood clearly",
+          "0:10-0:35 main melodic idea over the core progression",
+          "0:35-0:55 fuller arrangement with Piano",
+          "Main chord movement: C - Am - F - G",
+          "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+        ]
+      },
+      "sheetAvailable": true,
+      "lyricsAvailable": false,
+      "chords": [
+        "C",
+        "Am",
+        "F",
+        "G"
+      ],
+      "key": "F",
+      "timeSignature": "4/4",
+      "chordSheet": "CHORD SHEET\nKey: F \u00b7 BPM: 90 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel calm and let the Piano groove breathe.",
+      "musicSheet": {
+        "title": "Inspiration WXYZ",
+        "key": "F",
+        "bpm": 90,
+        "timeSignature": "4/4",
+        "scale": "F major/minor modal color",
+        "mood": "Calm",
+        "genre": "Piano",
+        "melodySketch": [
+          "Bar 1: F - A - D - A",
+          "Bar 2: G - A - C",
+          "Bar 3: D - C - A - G"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using C, Am, F, G",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the calm mood with Piano"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "displayTitle": "Inspiration WXYZ",
+      "songId": "WXYZ",
+      "fileUrl": "/generated/ECHO_WXYZ_original.mp3",
+      "generatedAudioUrl": "/generated/ECHO_WXYZ_original.mp3",
+      "musicgenUrl": null,
+      "aceAudioUrl": null,
+      "mp3Url": "/generated/ECHO_WXYZ_original.mp3",
+      "original_audio_url": "/generated/ECHO_WXYZ_original.mp3",
+      "original_download_url": "/api/song/WXYZ/audio",
+      "download_url": "/api/song/WXYZ/audio",
+      "downloadAudioUrl": "/api/song/WXYZ/audio",
+      "trimmed_audio_url": null,
+      "trimmed_download_url": null,
+      "ownerEmail": "test@echo.com",
+      "provider": "KIE.AI",
+      "lengthSeconds": 30,
+      "BPM": 90,
+      "beatsPerMinute": 90,
+      "isInstrumental": null,
+      "instrumental": null,
+      "vocalsEnabled": null,
+      "vocalMode": "",
+      "chord_sheet": "CHORD SHEET\nKey: F \u00b7 BPM: 90 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel calm and let the Piano groove breathe.",
+      "music_sheet": {
+        "title": "Inspiration WXYZ",
+        "key": "F",
+        "bpm": 90,
+        "timeSignature": "4/4",
+        "scale": "F major/minor modal color",
+        "mood": "Calm",
+        "genre": "Piano",
+        "melodySketch": [
+          "Bar 1: F - A - D - A",
+          "Bar 2: G - A - C",
+          "Bar 3: D - C - A - G"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using C, Am, F, G",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the calm mood with Piano"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "sheetMusic": {
+        "title": "Inspiration WXYZ",
+        "key": "F",
+        "bpm": 90,
+        "timeSignature": "4/4",
+        "scale": "F major/minor modal color",
+        "mood": "Calm",
+        "genre": "Piano",
+        "melodySketch": [
+          "Bar 1: F - A - D - A",
+          "Bar 2: G - A - C",
+          "Bar 3: D - C - A - G"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using C, Am, F, G",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the calm mood with Piano"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "sheetMusicPdfUrl": "",
+      "musicSheetPdfUrl": "",
+      "sheet_music_pdf_url": "",
+      "musicSheetLines": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with Piano",
+        "Main chord movement: C - Am - F - G",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ],
+      "lyricsSheetDownloadUrl": null,
+      "createdAt": "2026-06-09T00:00:00+00:00"
+    },
+    "QFAU": {
+      "code": "QFAU",
+      "song_id": "QFAU",
+      "task_id": "083842dcce68534e75f907d0482d12c0",
+      "created_at": "2026-06-19T15:18:25.937347+00:00",
+      "mood": "Trippy",
+      "theme": "Nature, Midnight",
+      "style": "Delicate, Psychedelic",
+      "instruments": [
+        "Synth, Violin"
+      ],
+      "tempo": 65,
+      "energy": 7,
+      "original_audio_filename": "ECHO_QFAU_vocal.mp3",
+      "audio_source_url": "https://tempfile.aiquickdraw.com/r/23abd0548c0b497db26dcbad13406e35.mp3",
+      "trimmed_audio_filename": null,
+      "mode": "kie-vocal",
+      "filename": "ECHO_QFAU_vocal.mp3",
+      "audio_filename": "ECHO_QFAU_vocal.mp3",
+      "genre": "Reggae, Lo-fi",
+      "mood_tag": "Trippy",
+      "bpm": 65,
+      "id": "QFAU",
+      "title": "Song QFAU",
+      "duration": 60,
+      "audio_path": "generated/ECHO_QFAU_vocal.mp3",
+      "audio_url": "/generated/ECHO_QFAU_vocal.mp3",
+      "output_file": "generated/ECHO_QFAU_vocal.mp3",
+      "lyrics": {
+        "label": "Verse",
+        "text": "Midnight in the moss Your shadow learns to bloom Fern leaves hold their breath Under a silver moon The river turns to glass And bends around our feet I can hear the roots Knocking in a sleep Stay a little longer Let the night unfold Every little heartbeat We are now at the University of Minnesota The heartbeat turns the dark to gold Moonlit moss pull me close Moonlit moss, don't let go Under the trees I drift and glow Moonlit moss, take me home Fireflies in the grass, right circles in the air Bare hands on the bark like a prayer laid there The wind tastes like rain on a forgotten road You smile like a secret I already know Stay a little longer let the night unfold Every little heartbeat turns the dark to gold Moonlit moss, pull me close Moonlit moss, don't let go Under the trees I drift and glow Moonlit moss, take me home Moonlit moss Take me home I was lost in the noise You were green in the black Now the whole wide world Leans and calls me back Moonlit moss pull me close Moonlit moss, don't let go Under the trees I drift and glow Moonlit moss, take me home Moonlit moss, pull me close Moonlit moss, don't let go Under the trees I drift and glow Moonlit moss, take me home Take me home"
+      },
+      "lyricsAvailable": true,
+      "sheet": {
+        "title": "Song QFAU",
+        "provider": "KIE.AI",
+        "mood": "Trippy",
+        "genre": "Reggae, Lo-fi",
+        "bpm": 65,
+        "key": "D",
+        "chords": [
+          "C",
+          "Am",
+          "F",
+          "G"
+        ],
+        "musicSheet": [
+          "0:00-0:10 soft intro that states the mood clearly",
+          "0:10-0:35 main melodic idea over the core progression",
+          "0:35-0:55 fuller arrangement with Synth, Violin",
+          "Main chord movement: C - Am - F - G",
+          "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+        ],
+        "lyrics": {
+          "label": "Verse",
+          "text": "Midnight in the moss Your shadow learns to bloom Fern leaves hold their breath Under a silver moon The river turns to glass And bends around our feet I can hear the roots Knocking in a sleep Stay a little longer Let the night unfold Every little heartbeat We are now at the University of Minnesota The heartbeat turns the dark to gold Moonlit moss pull me close Moonlit moss, don't let go Under the trees I drift and glow Moonlit moss, take me home Fireflies in the grass, right circles in the air Bare hands on the bark like a prayer laid there The wind tastes like rain on a forgotten road You smile like a secret I already know Stay a little longer let the night unfold Every little heartbeat turns the dark to gold Moonlit moss, pull me close Moonlit moss, don't let go Under the trees I drift and glow Moonlit moss, take me home Moonlit moss Take me home I was lost in the noise You were green in the black Now the whole wide world Leans and calls me back Moonlit moss pull me close Moonlit moss, don't let go Under the trees I drift and glow Moonlit moss, take me home Moonlit moss, pull me close Moonlit moss, don't let go Under the trees I drift and glow Moonlit moss, take me home Take me home"
+        }
+      },
+      "sheetAvailable": true,
+      "chords": [
+        "C",
+        "Am",
+        "F",
+        "G"
+      ],
+      "key": "D",
+      "chordSheet": "CHORD SHEET\nKey: D \u00b7 BPM: 65 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel trippy and let the Reggae, Lo-fi groove breathe.",
+      "musicSheet": {
+        "title": "Song QFAU",
+        "key": "D",
+        "bpm": 65,
+        "timeSignature": "4/4",
+        "scale": "D major/minor modal color",
+        "mood": "Trippy",
+        "genre": "Reggae, Lo-fi",
+        "structure": [
+          {
+            "time": "0:00 - 0:10",
+            "label": "Intro",
+            "description": "Soft opening that establishes the atmosphere"
+          },
+          {
+            "time": "0:10 - 0:30",
+            "label": "Main motif",
+            "description": "Core chord progression and melody enter"
+          },
+          {
+            "time": "0:30 - 1:00",
+            "label": "Hook",
+            "description": "Arrangement opens up with the strongest melodic idea"
+          }
+        ],
+        "melodySketch": [
+          "Bar 1: D - F# - B - F#",
+          "Bar 2: E - F# - A",
+          "Bar 3: B - A - F# - E"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using C, Am, F, G",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead texture: Reinforce the Trippy mood with Synth, Violin"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "timeSignature": "4/4",
+      "structure": [
+        {
+          "time": "0:00 - 0:10",
+          "label": "Intro",
+          "description": "Soft opening that establishes the atmosphere"
+        },
+        {
+          "time": "0:10 - 0:30",
+          "label": "Main motif",
+          "description": "Core chord progression and melody enter"
+        },
+        {
+          "time": "0:30 - 1:00",
+          "label": "Hook",
+          "description": "Arrangement opens up with the strongest melodic idea"
+        }
+      ],
+      "sheetMusicPdfUrl": "/generated/music_sheets/Song_QFAU_823823cc.pdf",
+      "musicSheetPdfUrl": "/generated/music_sheets/Song_QFAU_823823cc.pdf",
+      "sheetMusicPdfPath": "C:\\Users\\vibby\\Desktop\\coders\\learnings\\consecho\\backend\\generated\\music_sheets\\Song_QFAU_823823cc.pdf",
+      "displayTitle": "Song QFAU",
+      "songId": "QFAU",
+      "audioUrl": "/generated/ECHO_QFAU_vocal.mp3",
+      "fileUrl": "/generated/ECHO_QFAU_vocal.mp3",
+      "generatedAudioUrl": "/generated/ECHO_QFAU_vocal.mp3",
+      "musicgenUrl": null,
+      "aceAudioUrl": null,
+      "mp3Url": "/generated/ECHO_QFAU_vocal.mp3",
+      "original_audio_url": "/generated/ECHO_QFAU_vocal.mp3",
+      "original_download_url": "/api/song/QFAU/audio",
+      "download_url": "/api/song/QFAU/audio",
+      "downloadAudioUrl": "/api/song/QFAU/audio",
+      "trimmed_audio_url": null,
+      "trimmed_download_url": null,
+      "ownerEmail": "test@echo.com",
+      "provider": "KIE.AI",
+      "durationSeconds": 60,
+      "duration_seconds": 60,
+      "lengthSeconds": 60,
+      "BPM": 65,
+      "beatsPerMinute": 65,
+      "isInstrumental": null,
+      "instrumental": null,
+      "vocalsEnabled": null,
+      "vocalMode": "",
+      "chord_sheet": "CHORD SHEET\nKey: D \u00b7 BPM: 65 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel trippy and let the Reggae, Lo-fi groove breathe.",
+      "music_sheet": {
+        "title": "Song QFAU",
+        "key": "D",
+        "bpm": 65,
+        "timeSignature": "4/4",
+        "scale": "D major/minor modal color",
+        "mood": "Trippy",
+        "genre": "Reggae, Lo-fi",
+        "structure": [
+          {
+            "time": "0:00 - 0:10",
+            "label": "Intro",
+            "description": "Soft opening that establishes the atmosphere"
+          },
+          {
+            "time": "0:10 - 0:30",
+            "label": "Main motif",
+            "description": "Core chord progression and melody enter"
+          },
+          {
+            "time": "0:30 - 1:00",
+            "label": "Hook",
+            "description": "Arrangement opens up with the strongest melodic idea"
+          }
+        ],
+        "melodySketch": [
+          "Bar 1: D - F# - B - F#",
+          "Bar 2: E - F# - A",
+          "Bar 3: B - A - F# - E"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using C, Am, F, G",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead texture: Reinforce the Trippy mood with Synth, Violin"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "sheetMusic": {
+        "title": "Song QFAU",
+        "key": "D",
+        "bpm": 65,
+        "timeSignature": "4/4",
+        "scale": "D major/minor modal color",
+        "mood": "Trippy",
+        "genre": "Reggae, Lo-fi",
+        "structure": [
+          {
+            "time": "0:00 - 0:10",
+            "label": "Intro",
+            "description": "Soft opening that establishes the atmosphere"
+          },
+          {
+            "time": "0:10 - 0:30",
+            "label": "Main motif",
+            "description": "Core chord progression and melody enter"
+          },
+          {
+            "time": "0:30 - 1:00",
+            "label": "Hook",
+            "description": "Arrangement opens up with the strongest melodic idea"
+          }
+        ],
+        "melodySketch": [
+          "Bar 1: D - F# - B - F#",
+          "Bar 2: E - F# - A",
+          "Bar 3: B - A - F# - E"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using C, Am, F, G",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead texture: Reinforce the Trippy mood with Synth, Violin"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "sheet_music_pdf_url": "/generated/music_sheets/Song_QFAU_823823cc.pdf",
+      "musicSheetLines": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with Synth, Violin",
+        "Main chord movement: C - Am - F - G",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ],
+      "lyricsSheetDownloadUrl": "/api/song/QFAU/lyrics-sheet",
+      "createdAt": "2026-06-19T15:18:25.937347+00:00"
+    },
+    "ZRGV": {
+      "mode": "musicgen",
+      "code": "ZRGV",
+      "song_id": "ZRGV",
+      "created_at": "2026-06-19T16:34:05.682597+00:00",
+      "prompt": "30-second instrumental inspiration sketch. melancholy mood. Tempo 65 BPM. Moderate complexity. Energy level 4. Memorable melody. Creative sketch. Suitable for inspiring songwriters.",
+      "mood": "melancholy",
+      "theme": "",
+      "style": "",
+      "instruments": "",
+      "tempo": 65,
+      "complexity": "Moderate",
+      "duration": 30,
+      "energy": 4,
+      "generation_time_seconds": 568,
+      "generation_time": "9m 28s",
+      "filename": "ZRGV.wav",
+      "audio_filename": "ZRGV.wav",
+      "output_file": "generated/ZRGV.wav",
+      "audio_url": "/generated/ZRGV.wav",
+      "inference_seconds": 568.2,
+      "id": "ZRGV",
+      "title": "Song ZRGV",
+      "genre": "",
+      "bpm": 65,
+      "audio_path": "generated/ZRGV.wav",
+      "original_audio_filename": "ZRGV.wav",
+      "lyrics": null,
+      "copyright": {
+        "status": "unavailable",
+        "similarity_score": null,
+        "notes": "MusicGen does not produce lyrics for this instrumental inspiration.",
+        "matches": []
+      },
+      "sheet": {
+        "title": "Song ZRGV",
+        "provider": "MusicGen",
+        "mood": "melancholy",
+        "genre": "Selected style",
+        "bpm": 65,
+        "key": "F",
+        "chords": [
+          "C",
+          "Am",
+          "F",
+          "G"
+        ],
+        "musicSheet": [
+          "0:00-0:10 soft intro that states the mood clearly",
+          "0:10-0:35 main melodic idea over the core progression",
+          "0:35-0:55 fuller arrangement with lead melody, chords, bass, and light rhythm",
+          "Main chord movement: C - Am - F - G",
+          "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+        ]
+      },
+      "sheetAvailable": true,
+      "lyricsAvailable": false,
+      "chords": [
+        "C",
+        "Am",
+        "F",
+        "G"
+      ],
+      "key": "F",
+      "timeSignature": "4/4",
+      "chordSheet": "CHORD SHEET\nKey: F \u00b7 BPM: 65 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel melancholy and let the Selected style groove breathe.",
+      "musicSheet": {
+        "title": "Song ZRGV",
+        "key": "F",
+        "bpm": 65,
+        "timeSignature": "4/4",
+        "scale": "F major/minor modal color",
+        "mood": "melancholy",
+        "genre": "Selected style",
+        "melodySketch": [
+          "Bar 1: F - A - D - A",
+          "Bar 2: G - A - C",
+          "Bar 3: D - C - A - G"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using C, Am, F, G",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the melancholy mood with piano/synth, bass, drums, and lead texture"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "displayTitle": "Song ZRGV",
+      "songId": "ZRGV",
+      "audioUrl": "/generated/ZRGV.wav",
+      "fileUrl": "/generated/ZRGV.wav",
+      "generatedAudioUrl": "/generated/ZRGV.wav",
+      "musicgenUrl": "/generated/ZRGV.wav",
+      "aceAudioUrl": null,
+      "mp3Url": null,
+      "original_audio_url": "/generated/ZRGV.wav",
+      "original_download_url": "/api/song/ZRGV/audio",
+      "download_url": "/api/song/ZRGV/audio",
+      "downloadAudioUrl": "/api/song/ZRGV/audio",
+      "trimmed_audio_url": null,
+      "trimmed_download_url": null,
+      "ownerEmail": "test@echo.com",
+      "provider": "MusicGen",
+      "durationSeconds": 30,
+      "duration_seconds": 30,
+      "lengthSeconds": 30,
+      "BPM": 65,
+      "beatsPerMinute": 65,
+      "isInstrumental": null,
+      "instrumental": null,
+      "vocalsEnabled": null,
+      "vocalMode": "",
+      "chord_sheet": "CHORD SHEET\nKey: F \u00b7 BPM: 65 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel melancholy and let the Selected style groove breathe.",
+      "music_sheet": {
+        "title": "Song ZRGV",
+        "key": "F",
+        "bpm": 65,
+        "timeSignature": "4/4",
+        "scale": "F major/minor modal color",
+        "mood": "melancholy",
+        "genre": "Selected style",
+        "melodySketch": [
+          "Bar 1: F - A - D - A",
+          "Bar 2: G - A - C",
+          "Bar 3: D - C - A - G"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using C, Am, F, G",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the melancholy mood with piano/synth, bass, drums, and lead texture"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "sheetMusic": {
+        "title": "Song ZRGV",
+        "key": "F",
+        "bpm": 65,
+        "timeSignature": "4/4",
+        "scale": "F major/minor modal color",
+        "mood": "melancholy",
+        "genre": "Selected style",
+        "melodySketch": [
+          "Bar 1: F - A - D - A",
+          "Bar 2: G - A - C",
+          "Bar 3: D - C - A - G"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using C, Am, F, G",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the melancholy mood with piano/synth, bass, drums, and lead texture"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "sheetMusicPdfUrl": "",
+      "musicSheetPdfUrl": "",
+      "sheet_music_pdf_url": "",
+      "musicSheetLines": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with lead melody, chords, bass, and light rhythm",
+        "Main chord movement: C - Am - F - G",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ],
+      "lyricsSheetDownloadUrl": null,
+      "createdAt": "2026-06-19T16:34:05.682597+00:00"
+    },
+    "AXGV": {
+      "mode": "ace-step",
+      "code": "AXGV",
+      "song_id": "AXGV",
+      "created_at": "2026-06-19T16:38:03.600245+00:00",
+      "prompt": "romantic rock, 142bpm, inspiration",
+      "mood": "romantic",
+      "theme": "inspiration",
+      "style": "rock",
+      "instruments": [
+        "acoustic guitar"
+      ],
+      "tempo": 142,
+      "complexity": "Moderate",
+      "duration": 60,
+      "energy": 5,
+      "filename": "ECHO_AXGV_ace.mp3",
+      "audio_filename": "ECHO_AXGV_ace.mp3",
+      "original_audio_filename": "ECHO_AXGV_ace.mp3",
+      "output_file": "generated/ECHO_AXGV_ace.mp3",
+      "audio_url": "/generated/ECHO_AXGV_ace.mp3",
+      "lyrics": {
+        "label": "Verse",
+        "text": "Lost in the moment, I see your face"
+      },
+      "copyright": {
+        "status": "safe",
+        "similarity_score": 0.91,
+        "notes": "Appears original.",
+        "matches": [],
+        "risk": "None",
+        "copyright_status": "Unknown",
+        "song_title": "",
+        "artist": "",
+        "details": "No strong evidence of existing lyrics."
+      },
+      "id": "AXGV",
+      "title": "Song AXGV",
+      "genre": "rock",
+      "bpm": 142,
+      "audio_path": "generated/ECHO_AXGV_ace.mp3",
+      "sheet": {
+        "title": "Song AXGV",
+        "provider": "Ace AI",
+        "mood": "romantic",
+        "genre": "rock",
+        "bpm": 142,
+        "key": "A",
+        "chords": [
+          "Cmaj7",
+          "Am7",
+          "Dm7",
+          "G7"
+        ],
+        "musicSheet": [
+          "0:00-0:10 soft intro that states the mood clearly",
+          "0:10-0:35 main melodic idea over the core progression",
+          "0:35-0:55 fuller arrangement with acoustic guitar",
+          "Main chord movement: Cmaj7 - Am7 - Dm7 - G7",
+          "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+        ],
+        "lyrics": {
+          "label": "Verse",
+          "text": "Lost in the moment, I see your face"
+        }
+      },
+      "sheetAvailable": true,
+      "lyricsAvailable": true,
+      "chords": [
+        "Cmaj7",
+        "Am7",
+        "Dm7",
+        "G7"
+      ],
+      "key": "A",
+      "timeSignature": "4/4",
+      "chordSheet": "CHORD SHEET\nKey: A \u00b7 BPM: 142 \u00b7 Time Signature: 4/4\n\n[Intro]\n| Cmaj7 | Am7 | Dm7 | G7 |\n\n[Verse]\n| Cmaj7 | Am7 | Dm7 | G7 |\n| Am7 | Dm7 | G7 | Cmaj7 |\n\n[Hook]\n| Dm7 | G7 | Cmaj7 | Am7 |\n| G7 | Cmaj7 | Am7 | Dm7 |\n\nPerformance Notes:\nKeep the feel romantic and let the rock groove breathe.",
+      "musicSheet": {
+        "title": "Song AXGV",
+        "key": "A",
+        "bpm": 142,
+        "timeSignature": "4/4",
+        "scale": "A major/minor modal color",
+        "mood": "romantic",
+        "genre": "rock",
+        "melodySketch": [
+          "Bar 1: A - C - G - C",
+          "Bar 2: B - C - E",
+          "Bar 3: G - E - C - B"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using Cmaj7, Am7, Dm7, G7",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the romantic mood with acoustic guitar"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "sheetMusicPdfUrl": "/generated/music_sheets/Song_AXGV_4ed546f9.pdf",
+      "musicSheetPdfUrl": "/generated/music_sheets/Song_AXGV_4ed546f9.pdf",
+      "sheetMusicPdfPath": "C:\\Users\\vibby\\Desktop\\coders\\learnings\\consecho\\backend\\generated\\music_sheets\\Song_AXGV_4ed546f9.pdf",
+      "displayTitle": "Song AXGV",
+      "songId": "AXGV",
+      "audioUrl": "/generated/ECHO_AXGV_ace.mp3",
+      "fileUrl": "/generated/ECHO_AXGV_ace.mp3",
+      "generatedAudioUrl": "/generated/ECHO_AXGV_ace.mp3",
+      "musicgenUrl": null,
+      "aceAudioUrl": "/generated/ECHO_AXGV_ace.mp3",
+      "mp3Url": "/generated/ECHO_AXGV_ace.mp3",
+      "original_audio_url": "/generated/ECHO_AXGV_ace.mp3",
+      "original_download_url": "/api/song/AXGV/audio",
+      "download_url": "/api/song/AXGV/audio",
+      "downloadAudioUrl": "/api/song/AXGV/audio",
+      "trimmed_audio_url": null,
+      "trimmed_download_url": null,
+      "ownerEmail": "test@echo.com",
+      "provider": "Ace AI",
+      "durationSeconds": 60,
+      "duration_seconds": 60,
+      "lengthSeconds": 60,
+      "BPM": 142,
+      "beatsPerMinute": 142,
+      "isInstrumental": null,
+      "instrumental": null,
+      "vocalsEnabled": null,
+      "vocalMode": "",
+      "chord_sheet": "CHORD SHEET\nKey: A \u00b7 BPM: 142 \u00b7 Time Signature: 4/4\n\n[Intro]\n| Cmaj7 | Am7 | Dm7 | G7 |\n\n[Verse]\n| Cmaj7 | Am7 | Dm7 | G7 |\n| Am7 | Dm7 | G7 | Cmaj7 |\n\n[Hook]\n| Dm7 | G7 | Cmaj7 | Am7 |\n| G7 | Cmaj7 | Am7 | Dm7 |\n\nPerformance Notes:\nKeep the feel romantic and let the rock groove breathe.",
+      "music_sheet": {
+        "title": "Song AXGV",
+        "key": "A",
+        "bpm": 142,
+        "timeSignature": "4/4",
+        "scale": "A major/minor modal color",
+        "mood": "romantic",
+        "genre": "rock",
+        "melodySketch": [
+          "Bar 1: A - C - G - C",
+          "Bar 2: B - C - E",
+          "Bar 3: G - E - C - B"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using Cmaj7, Am7, Dm7, G7",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the romantic mood with acoustic guitar"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "sheetMusic": {
+        "title": "Song AXGV",
+        "key": "A",
+        "bpm": 142,
+        "timeSignature": "4/4",
+        "scale": "A major/minor modal color",
+        "mood": "romantic",
+        "genre": "rock",
+        "melodySketch": [
+          "Bar 1: A - C - G - C",
+          "Bar 2: B - C - E",
+          "Bar 3: G - E - C - B"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using Cmaj7, Am7, Dm7, G7",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the romantic mood with acoustic guitar"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "sheet_music_pdf_url": "/generated/music_sheets/Song_AXGV_4ed546f9.pdf",
+      "musicSheetLines": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with acoustic guitar",
+        "Main chord movement: Cmaj7 - Am7 - Dm7 - G7",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ],
+      "lyricsSheetDownloadUrl": "/api/song/AXGV/lyrics-sheet",
+      "createdAt": "2026-06-19T16:38:03.600245+00:00"
     }
   }
 }

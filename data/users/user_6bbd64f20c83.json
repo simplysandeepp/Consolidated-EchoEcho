@@ -294,5 +294,334 @@
       "G"
     ],
     "key": "C"
+  },
+  {
+    "code": "QFAU",
+    "song_id": "QFAU",
+    "task_id": "083842dcce68534e75f907d0482d12c0",
+    "created_at": "2026-06-19T15:18:25.937347+00:00",
+    "mood": "Trippy",
+    "theme": "Nature, Midnight",
+    "style": "Delicate, Psychedelic",
+    "instruments": [
+      "Synth, Violin"
+    ],
+    "tempo": 65,
+    "energy": 7,
+    "original_audio_filename": "ECHO_QFAU_vocal.mp3",
+    "audio_source_url": "https://tempfile.aiquickdraw.com/r/23abd0548c0b497db26dcbad13406e35.mp3",
+    "trimmed_audio_filename": null,
+    "mode": "kie-vocal",
+    "filename": "ECHO_QFAU_vocal.mp3",
+    "audio_filename": "ECHO_QFAU_vocal.mp3",
+    "genre": "Reggae, Lo-fi",
+    "mood_tag": "Trippy",
+    "bpm": 65,
+    "id": "QFAU",
+    "title": "Song QFAU",
+    "duration": 60,
+    "audio_path": "generated/ECHO_QFAU_vocal.mp3",
+    "audio_url": "/generated/ECHO_QFAU_vocal.mp3",
+    "output_file": "generated/ECHO_QFAU_vocal.mp3",
+    "lyrics": {
+      "label": "Verse",
+      "text": "Midnight in the moss Your shadow learns to bloom Fern leaves hold their breath Under a silver moon The river turns to glass And bends around our feet I can hear the roots Knocking in a sleep Stay a little longer Let the night unfold Every little heartbeat We are now at the University of Minnesota The heartbeat turns the dark to gold Moonlit moss pull me close Moonlit moss, don't let go Under the trees I drift and glow Moonlit moss, take me home Fireflies in the grass, right circles in the air Bare hands on the bark like a prayer laid there The wind tastes like rain on a forgotten road You smile like a secret I already know Stay a little longer let the night unfold Every little heartbeat turns the dark to gold Moonlit moss, pull me close Moonlit moss, don't let go Under the trees I drift and glow Moonlit moss, take me home Moonlit moss Take me home I was lost in the noise You were green in the black Now the whole wide world Leans and calls me back Moonlit moss pull me close Moonlit moss, don't let go Under the trees I drift and glow Moonlit moss, take me home Moonlit moss, pull me close Moonlit moss, don't let go Under the trees I drift and glow Moonlit moss, take me home Take me home"
+    },
+    "lyricsAvailable": true,
+    "sheet": {
+      "title": "Song QFAU",
+      "provider": "KIE.AI",
+      "mood": "Trippy",
+      "genre": "Reggae, Lo-fi",
+      "bpm": 65,
+      "key": "D",
+      "chords": [
+        "C",
+        "Am",
+        "F",
+        "G"
+      ],
+      "musicSheet": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with Synth, Violin",
+        "Main chord movement: C - Am - F - G",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ],
+      "lyrics": {
+        "label": "Verse",
+        "text": "Midnight in the moss Your shadow learns to bloom Fern leaves hold their breath Under a silver moon The river turns to glass And bends around our feet I can hear the roots Knocking in a sleep Stay a little longer Let the night unfold Every little heartbeat We are now at the University of Minnesota The heartbeat turns the dark to gold Moonlit moss pull me close Moonlit moss, don't let go Under the trees I drift and glow Moonlit moss, take me home Fireflies in the grass, right circles in the air Bare hands on the bark like a prayer laid there The wind tastes like rain on a forgotten road You smile like a secret I already know Stay a little longer let the night unfold Every little heartbeat turns the dark to gold Moonlit moss, pull me close Moonlit moss, don't let go Under the trees I drift and glow Moonlit moss, take me home Moonlit moss Take me home I was lost in the noise You were green in the black Now the whole wide world Leans and calls me back Moonlit moss pull me close Moonlit moss, don't let go Under the trees I drift and glow Moonlit moss, take me home Moonlit moss, pull me close Moonlit moss, don't let go Under the trees I drift and glow Moonlit moss, take me home Take me home"
+      }
+    },
+    "sheetAvailable": true,
+    "chords": [
+      "C",
+      "Am",
+      "F",
+      "G"
+    ],
+    "key": "D",
+    "chordSheet": "CHORD SHEET\nKey: D \u00b7 BPM: 65 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel trippy and let the Reggae, Lo-fi groove breathe.",
+    "musicSheet": {
+      "title": "Song QFAU",
+      "key": "D",
+      "bpm": 65,
+      "timeSignature": "4/4",
+      "scale": "D major/minor modal color",
+      "mood": "Trippy",
+      "genre": "Reggae, Lo-fi",
+      "structure": [
+        {
+          "time": "0:00 - 0:10",
+          "label": "Intro",
+          "description": "Soft opening that establishes the atmosphere"
+        },
+        {
+          "time": "0:10 - 0:30",
+          "label": "Main motif",
+          "description": "Core chord progression and melody enter"
+        },
+        {
+          "time": "0:30 - 1:00",
+          "label": "Hook",
+          "description": "Arrangement opens up with the strongest melodic idea"
+        }
+      ],
+      "melodySketch": [
+        "Bar 1: D - F# - B - F#",
+        "Bar 2: E - F# - A",
+        "Bar 3: B - A - F# - E"
+      ],
+      "arrangement": [
+        "Piano/Synth: Main harmonic bed using C, Am, F, G",
+        "Bass: Root-note movement that follows each bar",
+        "Drums: Light rhythmic support with space for the vocal or lead",
+        "Lead texture: Reinforce the Trippy mood with Synth, Violin"
+      ],
+      "productionNotes": [
+        "Keep transitions clean and loop-friendly.",
+        "Use the hook section as the loudest point of the preview.",
+        "Avoid overfilling the midrange so the main melody stays readable."
+      ]
+    },
+    "timeSignature": "4/4",
+    "structure": [
+      {
+        "time": "0:00 - 0:10",
+        "label": "Intro",
+        "description": "Soft opening that establishes the atmosphere"
+      },
+      {
+        "time": "0:10 - 0:30",
+        "label": "Main motif",
+        "description": "Core chord progression and melody enter"
+      },
+      {
+        "time": "0:30 - 1:00",
+        "label": "Hook",
+        "description": "Arrangement opens up with the strongest melodic idea"
+      }
+    ],
+    "sheetMusicPdfUrl": "/generated/music_sheets/Song_QFAU_823823cc.pdf",
+    "musicSheetPdfUrl": "/generated/music_sheets/Song_QFAU_823823cc.pdf",
+    "sheetMusicPdfPath": "C:\\Users\\vibby\\Desktop\\coders\\learnings\\consecho\\backend\\generated\\music_sheets\\Song_QFAU_823823cc.pdf"
+  },
+  {
+    "mode": "musicgen",
+    "code": "ZRGV",
+    "song_id": "ZRGV",
+    "created_at": "2026-06-19T16:34:05.682597+00:00",
+    "prompt": "30-second instrumental inspiration sketch. melancholy mood. Tempo 65 BPM. Moderate complexity. Energy level 4. Memorable melody. Creative sketch. Suitable for inspiring songwriters.",
+    "mood": "melancholy",
+    "theme": "",
+    "style": "",
+    "instruments": [],
+    "tempo": 65,
+    "complexity": "Moderate",
+    "duration": 30,
+    "energy": 4,
+    "generation_time_seconds": 568,
+    "generation_time": "9m 28s",
+    "filename": "ZRGV.wav",
+    "audio_filename": "ZRGV.wav",
+    "output_file": "generated/ZRGV.wav",
+    "audio_url": "/generated/ZRGV.wav",
+    "inference_seconds": 568.2,
+    "id": "ZRGV",
+    "title": "Song ZRGV",
+    "genre": "",
+    "bpm": 65,
+    "audio_path": "generated/ZRGV.wav",
+    "original_audio_filename": "ZRGV.wav",
+    "lyrics": null,
+    "copyright": {
+      "status": "unavailable",
+      "similarity_score": null,
+      "notes": "MusicGen does not produce lyrics for this instrumental inspiration.",
+      "matches": []
+    },
+    "sheet": {
+      "title": "Song ZRGV",
+      "provider": "MusicGen",
+      "mood": "melancholy",
+      "genre": "Selected style",
+      "bpm": 65,
+      "key": "F",
+      "chords": [
+        "C",
+        "Am",
+        "F",
+        "G"
+      ],
+      "musicSheet": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with lead melody, chords, bass, and light rhythm",
+        "Main chord movement: C - Am - F - G",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ]
+    },
+    "sheetAvailable": true,
+    "lyricsAvailable": false,
+    "chords": [
+      "C",
+      "Am",
+      "F",
+      "G"
+    ],
+    "key": "F",
+    "timeSignature": "4/4",
+    "chordSheet": "CHORD SHEET\nKey: F \u00b7 BPM: 65 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel melancholy and let the Selected style groove breathe.",
+    "musicSheet": {
+      "title": "Song ZRGV",
+      "key": "F",
+      "bpm": 65,
+      "timeSignature": "4/4",
+      "scale": "F major/minor modal color",
+      "mood": "melancholy",
+      "genre": "Selected style",
+      "melodySketch": [
+        "Bar 1: F - A - D - A",
+        "Bar 2: G - A - C",
+        "Bar 3: D - C - A - G"
+      ],
+      "arrangement": [
+        "Piano/Synth: Main harmonic bed using C, Am, F, G",
+        "Bass: Root-note movement that follows each bar",
+        "Drums: Light rhythmic support with space for the vocal or lead",
+        "Lead Texture: Reinforce the melancholy mood with piano/synth, bass, drums, and lead texture"
+      ],
+      "productionNotes": [
+        "Keep transitions clean and loop-friendly.",
+        "Use the hook section as the loudest point of the preview.",
+        "Avoid overfilling the midrange so the main melody stays readable."
+      ]
+    }
+  },
+  {
+    "mode": "ace-step",
+    "code": "AXGV",
+    "song_id": "AXGV",
+    "created_at": "2026-06-19T16:38:03.600245+00:00",
+    "prompt": "romantic rock, 142bpm, inspiration",
+    "mood": "romantic",
+    "theme": "inspiration",
+    "style": "rock",
+    "instruments": [
+      "acoustic guitar"
+    ],
+    "tempo": 142,
+    "complexity": "Moderate",
+    "duration": 60,
+    "energy": 5,
+    "filename": "ECHO_AXGV_ace.mp3",
+    "audio_filename": "ECHO_AXGV_ace.mp3",
+    "original_audio_filename": "ECHO_AXGV_ace.mp3",
+    "output_file": "generated/ECHO_AXGV_ace.mp3",
+    "audio_url": "/generated/ECHO_AXGV_ace.mp3",
+    "lyrics": {
+      "label": "Verse",
+      "text": "Lost in the moment, I see your face\nFlickers of memories, a lonely place\nI'm searching for answers, in the dark of night\nWill you be the light, that shines so bright?"
+    },
+    "copyright": {
+      "status": "safe",
+      "similarity_score": 0.91,
+      "notes": "Appears original.",
+      "matches": [],
+      "risk": "None",
+      "copyright_status": "Unknown",
+      "song_title": "",
+      "artist": "",
+      "details": "No strong evidence of existing lyrics."
+    },
+    "id": "AXGV",
+    "title": "Song AXGV",
+    "genre": "rock",
+    "bpm": 142,
+    "audio_path": "generated/ECHO_AXGV_ace.mp3",
+    "sheet": {
+      "title": "Song AXGV",
+      "provider": "Ace AI",
+      "mood": "romantic",
+      "genre": "rock",
+      "bpm": 142,
+      "key": "A",
+      "chords": [
+        "Cmaj7",
+        "Am7",
+        "Dm7",
+        "G7"
+      ],
+      "musicSheet": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with acoustic guitar",
+        "Main chord movement: Cmaj7 - Am7 - Dm7 - G7",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ],
+      "lyrics": {
+        "label": "Verse",
+        "text": "Lost in the moment, I see your face"
+      }
+    },
+    "sheetAvailable": true,
+    "lyricsAvailable": true,
+    "chords": [
+      "Cmaj7",
+      "Am7",
+      "Dm7",
+      "G7"
+    ],
+    "key": "A",
+    "timeSignature": "4/4",
+    "chordSheet": "CHORD SHEET\nKey: A \u00b7 BPM: 142 \u00b7 Time Signature: 4/4\n\n[Intro]\n| Cmaj7 | Am7 | Dm7 | G7 |\n\n[Verse]\n| Cmaj7 | Am7 | Dm7 | G7 |\n| Am7 | Dm7 | G7 | Cmaj7 |\n\n[Hook]\n| Dm7 | G7 | Cmaj7 | Am7 |\n| G7 | Cmaj7 | Am7 | Dm7 |\n\nPerformance Notes:\nKeep the feel romantic and let the rock groove breathe.",
+    "musicSheet": {
+      "title": "Song AXGV",
+      "key": "A",
+      "bpm": 142,
+      "timeSignature": "4/4",
+      "scale": "A major/minor modal color",
+      "mood": "romantic",
+      "genre": "rock",
+      "melodySketch": [
+        "Bar 1: A - C - G - C",
+        "Bar 2: B - C - E",
+        "Bar 3: G - E - C - B"
+      ],
+      "arrangement": [
+        "Piano/Synth: Main harmonic bed using Cmaj7, Am7, Dm7, G7",
+        "Bass: Root-note movement that follows each bar",
+        "Drums: Light rhythmic support with space for the vocal or lead",
+        "Lead Texture: Reinforce the romantic mood with acoustic guitar"
+      ],
+      "productionNotes": [
+        "Keep transitions clean and loop-friendly.",
+        "Use the hook section as the loudest point of the preview.",
+        "Avoid overfilling the midrange so the main melody stays readable."
+      ]
+    },
+    "sheetMusicPdfUrl": "/generated/music_sheets/Song_AXGV_4ed546f9.pdf",
+    "musicSheetPdfUrl": "/generated/music_sheets/Song_AXGV_4ed546f9.pdf",
+    "sheetMusicPdfPath": "C:\\Users\\vibby\\Desktop\\coders\\learnings\\consecho\\backend\\generated\\music_sheets\\Song_AXGV_4ed546f9.pdf"
   }
 ]

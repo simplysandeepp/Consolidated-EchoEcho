@@ -5,6 +5,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 import secrets
 import string
 import time
@@ -47,7 +48,7 @@ from .agents.lyrics_agent import generate_lyrics as generate_agent_lyrics
 from .agents.copyright_agent.main import check_copyright
 from .agents.copyright_agent.models.request_model import CopyrightCheckRequest
 from .ace_step_generator import generate_with_ace_step
-from .sheet_generator.music_sheet import _choose_chords, _choose_key
+from .sheet_generator.music_sheet import _choose_chords, _choose_key, generate_music_sheet_pdf
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -309,6 +310,8 @@ def library_song_summary(record: dict[str, Any], owner_email: str = "") -> dict[
         "audio_url": song.get("audio_url"),
         "downloadAudioUrl": song.get("downloadAudioUrl"),
         "duration": song.get("duration"),
+        "durationSeconds": song.get("durationSeconds") or song.get("duration"),
+        "duration_seconds": song.get("duration_seconds") or song.get("duration"),
         "mood": song.get("mood"),
         "genre": song.get("genre"),
         "bpm": song.get("bpm"),
@@ -463,7 +466,10 @@ def model_to_dict(model_instance: Any) -> dict[str, Any]:
 
 
 def lyrics_context(request: GenerateRequest, prompt: str) -> dict[str, Any]:
+    duration = int(request.duration or TARGET_SECONDS)
+    max_lines = 8 if duration <= 30 else 16 if duration <= 60 else 24 if duration <= 90 else 48
     return {
+        "title": request.title or "Generated Track",
         "prompt": prompt,
         "mood": first_or_join(request.moods or ([request.mood] if request.mood else []), ""),
         "theme": first_or_join(request.themes or ([request.theme] if request.theme else []), ""),
@@ -471,6 +477,8 @@ def lyrics_context(request: GenerateRequest, prompt: str) -> dict[str, Any]:
         "genre": first_or_join(request.genres or ([request.style] if request.style else []), ""),
         "tempo": request.tempo,
         "bpm": request.tempo,
+        "durationSeconds": duration,
+        "maxLines": max_lines,
         "complexity": request.complexity,
         "energy": request.energy,
         "instruments": request.instruments,
@@ -664,6 +672,124 @@ def build_music_sheet_lines(record: dict[str, Any], chords: list[str]) -> list[s
     ]
 
 
+def sheet_context(record: dict[str, Any]) -> dict[str, Any]:
+    sheet = record.get("sheet") if isinstance(record.get("sheet"), dict) else {}
+    lyrics = sheet.get("lyrics") if isinstance(sheet.get("lyrics"), dict) else None
+    lyrics_text = str((lyrics or {}).get("text") or "")
+    raw_lyrics = record.get("lyrics")
+    if not lyrics_text and isinstance(raw_lyrics, dict):
+        lyrics_text = str(raw_lyrics.get("text") or "")
+    elif not lyrics_text:
+        lyrics_text = str(raw_lyrics or "")
+    mood = str(record.get("mood") or record.get("mood_tag") or sheet.get("mood") or "")
+    genre = str(record.get("genre") or record.get("style") or sheet.get("genre") or "")
+    bpm = record.get("bpm") or record.get("tempo") or sheet.get("bpm") or 90
+    key = str(record.get("key") or sheet.get("key") or _choose_key(mood, genre))
+    chords = record.get("chords") or sheet.get("chords") or _choose_chords(mood)
+    if not isinstance(chords, list):
+        chords = _choose_chords(mood)
+    chords = [str(chord).strip() for chord in chords if str(chord).strip()] or _choose_chords(mood)
+    instruments = record.get("instruments") or []
+    if isinstance(instruments, list):
+        instrument_text = ", ".join(str(item).strip() for item in instruments if str(item).strip())
+    else:
+        instrument_text = str(instruments or "").strip()
+    return {
+        "title": record_title(record),
+        "mood": mood or "Original",
+        "genre": genre or "AI-generated",
+        "bpm": bpm,
+        "key": key,
+        "timeSignature": str(record.get("timeSignature") or sheet.get("timeSignature") or "4/4"),
+        "duration": int(float(record.get("duration") or record.get("duration_seconds") or 60)),
+        "instruments": instrument_text or "piano/synth, bass, drums, and lead texture",
+        "lyrics": lyrics_text.strip(),
+        "chords": chords,
+    }
+
+
+def clean_sheet_text(value: str) -> str:
+    text = str(value or "").replace("\r\n", "\n").replace("\r", "\n")
+    text = text.replace("PROVIDER IK", "").replace("MAIN CH", "Main chord movement")
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return "\n".join(line.strip() for line in text.splitlines()).strip()
+
+
+def section_bars(chords: list[str], offset: int = 0, rows: int = 1) -> list[str]:
+    if not chords:
+        chords = ["C", "Am", "F", "G"]
+    lines = []
+    for row in range(rows):
+        rotated = chords[(offset + row) % len(chords):] + chords[: (offset + row) % len(chords)]
+        while len(rotated) < 4:
+            rotated += chords
+        lines.append("| " + " | ".join(rotated[:4]) + " |")
+    return lines
+
+
+def build_chord_sheet(record: dict[str, Any]) -> str:
+    ctx = sheet_context(record)
+    chords = ctx["chords"]
+    lines = [
+        "CHORD SHEET",
+        f"Key: {ctx['key']} · BPM: {ctx['bpm']} · Time Signature: {ctx['timeSignature']}",
+        "",
+        "[Intro]",
+        *section_bars(chords, 0, 1),
+        "",
+        "[Verse]",
+        *section_bars(chords, 0, 2),
+        "",
+        "[Hook]",
+        *section_bars(chords, 2, 2),
+        "",
+        "Performance Notes:",
+        f"Keep the feel {str(ctx['mood']).lower()} and let the {ctx['genre']} groove breathe.",
+    ]
+    return clean_sheet_text("\n".join(lines))
+
+
+def build_music_sheet(record: dict[str, Any]) -> dict[str, Any]:
+    ctx = sheet_context(record)
+    key_root = re.sub(r"m$|maj.*$|min.*$", "", str(ctx["key"])) or "C"
+    notes = {
+        "C": ["C", "D", "E", "G", "A"],
+        "D": ["D", "E", "F#", "A", "B"],
+        "E": ["E", "F#", "G", "B", "C"],
+        "F": ["F", "G", "A", "C", "D"],
+        "G": ["G", "A", "B", "D", "E"],
+        "A": ["A", "B", "C", "E", "G"],
+        "B": ["B", "C#", "D#", "F#", "G#"],
+    }.get(key_root[:1].upper(), ["C", "D", "E", "G", "A"])
+    music_sheet = {
+        "title": ctx["title"],
+        "key": ctx["key"],
+        "bpm": ctx["bpm"],
+        "timeSignature": ctx["timeSignature"],
+        "scale": f"{ctx['key']} major/minor modal color",
+        "mood": ctx["mood"],
+        "genre": ctx["genre"],
+        "melodySketch": [
+            f"Bar 1: {notes[0]} - {notes[2]} - {notes[4]} - {notes[2]}",
+            f"Bar 2: {notes[1]} - {notes[2]} - {notes[3]}",
+            f"Bar 3: {notes[4]} - {notes[3]} - {notes[2]} - {notes[1]}",
+        ],
+        "arrangement": [
+            f"Piano/Synth: Main harmonic bed using {', '.join(ctx['chords'][:4])}",
+            "Bass: Root-note movement that follows each bar",
+            "Drums: Light rhythmic support with space for the vocal or lead",
+            f"Lead Texture: Reinforce the {str(ctx['mood']).lower()} mood with {ctx['instruments']}",
+        ],
+        "productionNotes": [
+            "Keep transitions clean and loop-friendly.",
+            "Use the hook section as the loudest point of the preview.",
+            "Avoid overfilling the midrange so the main melody stays readable.",
+        ],
+    }
+    return music_sheet
+
+
 def attach_sheet(record: dict[str, Any]) -> None:
     try:
         mood = str(record.get("mood") or record.get("mood_tag") or "Selected mood")
@@ -691,6 +817,9 @@ def attach_sheet(record: dict[str, Any]) -> None:
         record["lyricsAvailable"] = bool(lyrics)
         record["chords"] = chords
         record["key"] = key
+        record.setdefault("timeSignature", "4/4")
+        record.setdefault("chordSheet", build_chord_sheet(record))
+        record.setdefault("musicSheet", build_music_sheet(record))
     except Exception as exc:
         logger.warning("Sheet generation failed for %s: %s", record_code(record), exc)
         record["sheet"] = None
@@ -737,6 +866,15 @@ def media_type_for(filename: str) -> str:
 
 def generated_url(filename: str) -> str:
     return f"/generated/{Path(filename).name}"
+
+
+def generated_static_url(path: str | Path) -> str:
+    raw_path = Path(path)
+    try:
+        relative = raw_path.resolve().relative_to(GENERATED_DIR.resolve())
+    except ValueError:
+        relative = Path(raw_path.name)
+    return "/generated/" + relative.as_posix()
 
 
 def generated_audio_path(filename: str) -> Path:
@@ -807,8 +945,11 @@ def finalize_generated_record(
             "genre": genre or record.get("genre") or record.get("style") or "",
             "bpm": bpm or record.get("bpm") or record.get("tempo"),
             "duration": duration,
+            "durationSeconds": duration,
+            "duration_seconds": duration,
             "audio_path": relative_path,
             "audio_url": audio_url,
+            "audioUrl": audio_url,
             "filename": filename,
             "audio_filename": filename,
             "original_audio_filename": record.get("original_audio_filename") or filename,
@@ -875,13 +1016,58 @@ def state_song_for_user(song_id: str, request: Request) -> dict[str, Any] | None
     return song_detail_payload(song, owner_email=email)
 
 
+def update_state_song_for_user(song_id: str, request: Request, updates: dict[str, Any]) -> dict[str, Any] | None:
+    normalized = song_id.strip().upper()
+    email, _, state, user = state_user_entry(request)
+    if normalized not in set(str(item).upper() for item in user.get("songIds") or []):
+        return None
+    song = state["songs"].get(normalized)
+    if not isinstance(song, dict):
+        return None
+    owner = str(song.get("ownerEmail") or email).strip().lower()
+    if owner and owner != email:
+        return None
+    song.update(updates)
+    state["songs"][normalized] = song
+    write_user_state(state)
+
+    user_id = current_user_id(request)
+    history = read_history(user_id)
+    changed = False
+    for record in history:
+        if record_code(record) == normalized:
+            record.update(updates)
+            changed = True
+    if changed:
+        write_user_songs(user_id, history)
+    return song_detail_payload(song, owner_email=email)
+
+
 def with_urls(record: dict[str, Any]) -> dict[str, Any]:
     attach_sheet(record)
     code = record_code(record)
     original = original_filename(record)
     trimmed = trimmed_filename(record)
     source_url = record.get("audio_source_url") or None
-    saved_audio_url = record.get("audio_url") or record.get("audioUrl") or None
+    saved_audio_url = (
+        record.get("audio_url")
+        or record.get("audioUrl")
+        or record.get("fileUrl")
+        or record.get("file_url")
+        or record.get("outputUrl")
+        or record.get("output_url")
+        or record.get("generatedAudioUrl")
+        or record.get("generated_audio_url")
+        or record.get("musicgenUrl")
+        or record.get("musicgen_url")
+        or record.get("aceAudioUrl")
+        or record.get("ace_audio_url")
+        or record.get("mp3Url")
+        or record.get("mp3_url")
+        or record.get("url")
+        or record.get("path")
+        or None
+    )
 
     local_original_exists = original and generated_audio_path(original).exists()
     original_url = generated_url(original) if local_original_exists else saved_audio_url or source_url
@@ -905,6 +1091,11 @@ def with_urls(record: dict[str, Any]) -> dict[str, Any]:
         "audio_path": f"generated/{original}" if original else record.get("audio_path"),
         "audio_url": playable_url,
         "audioUrl": playable_url,
+        "fileUrl": playable_url,
+        "generatedAudioUrl": playable_url,
+        "musicgenUrl": playable_url if str(record.get("mode") or "").lower() == "musicgen" else record.get("musicgenUrl"),
+        "aceAudioUrl": playable_url if str(record.get("mode") or "").lower() in {"ace-step", "ace_step", "ace"} else record.get("aceAudioUrl"),
+        "mp3Url": playable_url if playable_url and str(playable_url).lower().endswith(".mp3") else record.get("mp3Url"),
         "original_audio_url": original_url,
         "original_download_url": f"/api/song/{code}/audio" if code and local_original_exists else None,
         "download_url": f"/api/song/{code}/audio" if code and local_original_exists else None,
@@ -918,12 +1109,15 @@ def with_urls(record: dict[str, Any]) -> dict[str, Any]:
 
 
 def song_detail_payload(record: dict[str, Any], owner_email: str = "") -> dict[str, Any]:
+    persisted_chord_sheet = record.get("chordSheet") if isinstance(record.get("chordSheet"), str) else ""
+    persisted_music_sheet = record.get("musicSheet") if isinstance(record.get("musicSheet"), dict) else None
     song = with_urls(record)
     sheet = song.get("sheet") if isinstance(song.get("sheet"), dict) else {}
     lyrics_sheet = sheet.get("lyrics") if isinstance(sheet.get("lyrics"), dict) else None
     lyrics_text = str((lyrics_sheet or {}).get("text") or "").strip()
     has_lyrics = bool(song.get("lyricsAvailable") and lyrics_text)
     code = record_code(song)
+    inline_music_sheet = persisted_music_sheet
     return {
         **song,
         "songId": code,
@@ -935,13 +1129,32 @@ def song_detail_payload(record: dict[str, Any], owner_email: str = "") -> dict[s
         "audioUrl": song.get("audioUrl") or song.get("audio_url") or "",
         "audio_url": song.get("audio_url") or song.get("audioUrl") or "",
         "downloadAudioUrl": song.get("downloadAudioUrl") or song.get("download_url"),
-        "duration": song.get("duration") or 0,
-        "mood": song.get("mood") or song.get("mood_tag") or "",
+        "duration": song.get("duration") or song.get("durationSeconds") or song.get("duration_seconds") or song.get("lengthSeconds") or 0,
+        "durationSeconds": song.get("duration") or song.get("durationSeconds") or song.get("duration_seconds") or song.get("lengthSeconds") or 0,
+        "duration_seconds": song.get("duration") or song.get("durationSeconds") or song.get("duration_seconds") or song.get("lengthSeconds") or 0,
+        "lengthSeconds": song.get("lengthSeconds") or song.get("durationSeconds") or song.get("duration_seconds") or song.get("duration") or 0,
+        "mood": song.get("mood") or song.get("vibe") or song.get("emotion") or song.get("mood_tag") or "",
         "genre": song.get("genre") or song.get("style") or "",
-        "bpm": song.get("bpm") or song.get("tempo") or 90,
+        "bpm": song.get("bpm") or song.get("BPM") or song.get("beatsPerMinute") or song.get("tempo") or 90,
+        "BPM": song.get("BPM") or song.get("bpm") or song.get("tempo") or 90,
+        "beatsPerMinute": song.get("beatsPerMinute") or song.get("bpm") or song.get("tempo") or 90,
+        "instruments": song.get("instruments") or song.get("instrumentTags") or song.get("instrumentation") or song.get("instrument") or "",
+        "isInstrumental": song.get("isInstrumental") if song.get("isInstrumental") is not None else song.get("instrumental"),
+        "instrumental": song.get("instrumental") if song.get("instrumental") is not None else song.get("isInstrumental"),
+        "vocalsEnabled": song.get("vocalsEnabled"),
+        "vocalMode": song.get("vocalMode") or ("instrumental" if song.get("vocalsEnabled") is False else ""),
         "key": song.get("key") or sheet.get("key") or "",
         "chords": sheet.get("chords") or song.get("chords") or [],
-        "musicSheet": sheet.get("musicSheet") or song.get("musicSheet") or [],
+        "chordSheet": persisted_chord_sheet,
+        "chord_sheet": persisted_chord_sheet,
+        "musicSheet": inline_music_sheet,
+        "music_sheet": inline_music_sheet,
+        "sheetMusic": inline_music_sheet,
+        "sheetMusicPdfUrl": song.get("sheetMusicPdfUrl") or song.get("musicSheetPdfUrl") or "",
+        "musicSheetPdfUrl": song.get("musicSheetPdfUrl") or song.get("sheetMusicPdfUrl") or "",
+        "sheet_music_pdf_url": song.get("sheetMusicPdfUrl") or song.get("musicSheetPdfUrl") or "",
+        "timeSignature": song.get("timeSignature") or sheet.get("timeSignature") or "4/4",
+        "musicSheetLines": sheet.get("musicSheet") if isinstance(sheet.get("musicSheet"), list) else [],
         "lyrics": lyrics_sheet if has_lyrics else None,
         "lyricsAvailable": has_lyrics,
         "sheetAvailable": bool(song.get("sheetAvailable") and (sheet.get("musicSheet") or sheet.get("chords"))),
@@ -1211,7 +1424,13 @@ def generate_with_musicgen(
         "tempo": request.tempo,
         "complexity": request.complexity,
         "duration": request.duration,
+        "durationSeconds": request.duration,
+        "duration_seconds": request.duration,
         "energy": request.energy,
+        "isInstrumental": True,
+        "vocalsEnabled": False,
+        "aiVocals": False,
+        "vocalMode": "instrumental",
         "generation_time_seconds": round(total_seconds),
         "generation_time": format_seconds(total_seconds),
         "filename": filename,
@@ -1384,6 +1603,7 @@ class AceStepLyricsRequest(BaseModel):
     vocal: str = ""
     tempo: int = 90
     energy: int = 5
+    duration: int = 60
     prompt: str = ""
     promptText: str = ""
 
@@ -1405,16 +1625,21 @@ def api_ace_step_lyrics(request: AceStepLyricsRequest) -> dict[str, Any]:
     energy_words = {1:"very calm",2:"calm",3:"mellow",4:"relaxed",5:"moderate",
                     6:"upbeat",7:"energetic",8:"intense",9:"very intense",10:"extreme"}
     energy_desc = energy_words.get(request.energy, "moderate")
+    duration = int(request.duration or 60)
+    max_lines = 8 if duration <= 30 else 16 if duration <= 60 else 24 if duration <= 90 else 48
 
     system = (
-        "You are a professional songwriter. Write original song lyrics in ACE-Step format. "
+        "You are a professional songwriter. Write original song lyrics for an AI-generated song preview. "
         "Use ONLY these section tags exactly as written: [verse], [pre-chorus], [chorus], [bridge]. "
-        "Each section tag must be on its own line. Write 3-4 lines per section. "
+        "Each section tag must be on its own line. Write short, singable lines. "
+        "Do not write a full song for a short preview. Do not output one paragraph. "
         "Never use [Verse 1] or numbered variants — only [verse] and [chorus]. "
         "Output ONLY the lyrics, no explanations."
     )
     user_prompt = (
-        f"Write a full song with [verse], [chorus], [verse], [chorus], [bridge], [chorus] structure.\n"
+        f"Write lyrics that fit inside {duration} seconds.\n"
+        f"Maximum lyric lines: {max_lines}.\n"
+        "Use section labels and 2-4 short lines per section.\n"
         f"Mood: {request.mood or 'emotional'}\n"
         f"Genre: {request.genre or 'pop'}\n"
         f"Instruments: {request.instruments or 'piano, guitar'}\n"
@@ -1685,6 +1910,105 @@ def api_song(song_id: str, request: Request) -> dict[str, Any]:
     if record:
         return {"ok": True, "song": record}
     raise HTTPException(status_code=404, detail="Song not found")
+
+
+@app.get("/tracks/{song_id}")
+def api_track(song_id: str, request: Request) -> dict[str, Any]:
+    record = state_song_for_user(song_id, request)
+    if not record:
+        migrate_history_to_state(request)
+        record = state_song_for_user(song_id, request)
+    if record:
+        return {"ok": True, "track": record, "song": record}
+    raise HTTPException(status_code=404, detail="Track not found")
+
+
+@app.post("/api/song/{song_id}/generate-chords")
+@app.post("/tracks/{song_id}/generate-chords")
+def api_song_generate_chords(song_id: str, request: Request) -> dict[str, Any]:
+    record = state_song_for_user(song_id, request)
+    if not record:
+        migrate_history_to_state(request)
+        record = state_song_for_user(song_id, request)
+    if not record:
+        raise HTTPException(status_code=404, detail="Song not found")
+    chord_sheet = build_chord_sheet(record)
+    updated = update_state_song_for_user(song_id, request, {"chordSheet": chord_sheet})
+    if not updated:
+        raise HTTPException(status_code=404, detail="Song not found")
+    return {"ok": True, "chordSheet": chord_sheet, "song": updated}
+
+
+@app.post("/api/song/{song_id}/generate-music-sheet")
+@app.post("/tracks/{song_id}/generate-music-sheet")
+def api_song_generate_music_sheet(song_id: str, request: Request) -> dict[str, Any]:
+    record = state_song_for_user(song_id, request)
+    if not record:
+        migrate_history_to_state(request)
+        record = state_song_for_user(song_id, request)
+    if not record:
+        raise HTTPException(status_code=404, detail="Song not found")
+    music_sheet = build_music_sheet(record)
+    updates = {
+        "musicSheet": music_sheet,
+        "timeSignature": music_sheet.get("timeSignature") or "4/4",
+    }
+    updated = update_state_song_for_user(song_id, request, updates)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Song not found")
+    return {"ok": True, "musicSheet": music_sheet, "song": updated}
+
+
+@app.post("/api/song/{song_id}/generate-sheet-music-pdf")
+@app.post("/tracks/{song_id}/generate-sheet-music-pdf")
+def api_song_generate_sheet_music_pdf(song_id: str, request: Request) -> dict[str, Any]:
+    record = state_song_for_user(song_id, request)
+    if not record:
+        migrate_history_to_state(request)
+        record = state_song_for_user(song_id, request)
+    if not record:
+        raise HTTPException(status_code=404, detail="Song not found")
+
+    existing_url = record.get("sheetMusicPdfUrl") or record.get("musicSheetPdfUrl")
+    if existing_url:
+        return {
+            "ok": True,
+            "pdfUrl": existing_url,
+            "sheetMusicPdfUrl": existing_url,
+            "filename": Path(str(existing_url)).name or f"{song_id.lower()}-sheet-music.pdf",
+            "song": record,
+        }
+
+    ctx = sheet_context(record)
+    ctx.update({
+        "song_title": ctx["title"],
+        "title": ctx["title"],
+        "song_id": record_code(record) or song_id,
+        "tempo": ctx["bpm"],
+        "bpm": ctx["bpm"],
+        "timeSignature": ctx["timeSignature"],
+        "chords": ctx["chords"],
+    })
+    try:
+        result = generate_music_sheet_pdf(ctx)
+    except Exception as exc:
+        logger.exception("Sheet music PDF generation failed for %s", song_id)
+        raise HTTPException(status_code=500, detail="Sheet music PDF could not be generated.") from exc
+
+    pdf_path = Path(result.get("music_sheet_pdf") or "")
+    if not pdf_path.exists():
+        raise HTTPException(status_code=500, detail="Sheet music PDF could not be generated.")
+    pdf_url = generated_static_url(pdf_path)
+    filename = pdf_path.name
+    updates = {
+        "sheetMusicPdfUrl": pdf_url,
+        "musicSheetPdfUrl": pdf_url,
+        "sheetMusicPdfPath": str(pdf_path),
+    }
+    updated = update_state_song_for_user(song_id, request, updates)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Song not found")
+    return {"ok": True, "pdfUrl": pdf_url, "sheetMusicPdfUrl": pdf_url, "filename": filename, "song": updated}
 
 
 @app.get("/api/song/{song_id}/lyrics-sheet")

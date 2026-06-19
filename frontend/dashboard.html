@@ -1079,28 +1079,60 @@ function hasLyrics(t){
 function normalizeAudioUrl(value){
   if(!value) return '';
   const url = String(value);
-  if(/^https?:\/\//i.test(url) || url.startsWith('/')) return url;
+  if(/^(https?:|blob:)/i.test(url) || url.startsWith('/')) return url;
   return '/' + url.replace(/^\/+/, '');
 }
+function rawTrackAudioUrl(t){
+  return t && (
+    t.audioUrl ||
+    t.audio_url ||
+    t.fileUrl ||
+    t.file_url ||
+    t.outputUrl ||
+    t.output_url ||
+    t.generatedAudioUrl ||
+    t.generated_audio_url ||
+    t.musicgenUrl ||
+    t.musicgen_url ||
+    t.aceAudioUrl ||
+    t.ace_audio_url ||
+    t.mp3Url ||
+    t.mp3_url ||
+    t.original_audio_url ||
+    t.trimmed_audio_url ||
+    t.audio_path ||
+    t.downloadAudioUrl ||
+    t.download_url ||
+    t.url ||
+    t.path ||
+    ''
+  );
+}
 function trackAudioUrl(t){
-  return normalizeAudioUrl(t.audio_url || t.original_audio_url || t.audio_path || '');
+  return normalizeAudioUrl(rawTrackAudioUrl(t));
 }
 function resolveAudioUrl(url){
-  if(/^https?:\/\//i.test(url)) return url;
+  if(/^(https?:|blob:)/i.test(url)) return url;
   return API_BASE + url;
 }
 function normalizeTrack(t){
-  const id = String(t.id || t.song_id || t.code || ('track_' + Date.now()));
+  const id = String(t.id || t.song_id || t.songId || t.trackId || t.track_id || t.code || ('track_' + Date.now()));
   const audioUrl = trackAudioUrl(t);
-  const duration = Number(t.duration ?? t.duration_seconds ?? t.trimmed_duration_seconds ?? 0);
+  const duration = Number(t.durationSeconds ?? t.duration_seconds ?? t.duration ?? t.lengthSeconds ?? t.length_seconds ?? t.trimmed_duration_seconds ?? 0);
   return {
     ...t,
     id,
     title: t.title || [t.mood, t.theme || t.genre || t.style].filter(Boolean).join(' · ') || 'Generated Track',
+    title: t.title || t.songTitle || t.promptTitle || [t.mood || t.vibe || t.emotion, t.theme || t.genre || t.style].filter(Boolean).join(' - ') || 'Generated Track',
     genre: t.genre || t.style || '',
-    bpm: t.bpm || t.tempo || '',
+    bpm: t.bpm || t.BPM || t.beatsPerMinute || t.tempo || '',
     duration: Number.isFinite(duration) ? duration : 0,
     audio_url: audioUrl,
+    audioUrl: audioUrl,
+    fileUrl: audioUrl,
+    generatedAudioUrl: audioUrl,
+    musicgenUrl: t.musicgenUrl || t.musicgen_url || audioUrl,
+    aceAudioUrl: t.aceAudioUrl || t.ace_audio_url || t.mp3Url || t.mp3_url || audioUrl,
     audio_path: t.audio_path || (audioUrl.startsWith('/generated/') ? audioUrl.slice(1) : ''),
     created_at: t.created_at || t.date || new Date().toISOString(),
     date: t.date || t.created_at || new Date().toISOString(),

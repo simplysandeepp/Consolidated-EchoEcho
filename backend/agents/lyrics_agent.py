@@ -58,23 +58,50 @@ def generate_lyrics(context: dict[str, Any]) -> dict[str, str]:
     genre = context.get("genre") or context.get("style") or "the selected style"
     theme = context.get("theme") or context.get("prompt") or "the song idea"
     tempo = context.get("tempo") or context.get("bpm") or "the chosen"
+    duration = int(context.get("durationSeconds") or context.get("duration") or 60)
+    max_lines = int(context.get("maxLines") or (8 if duration <= 30 else 16 if duration <= 60 else 24 if duration <= 90 else 48))
+    title = context.get("title") or "Generated Track"
+    instruments = context.get("instruments") or []
     prompt = context.get("prompt") or ""
 
     llm = _create_llm()
     agent = create_lyrics_agent(llm)
     task = Task(
         description=(
-            "Write original, singable lyrics for this generated music idea.\n"
+            "You are a professional songwriter.\n\n"
+            "Create lyrics for an AI-generated song preview.\n\n"
+            "Track metadata:\n"
+            f"Title: {title}\n"
             f"Mood: {mood}\n"
-            f"Genre/style: {genre}\n"
+            f"Genre: {genre}\n"
+            f"BPM: {tempo}\n"
+            f"Duration: {duration} seconds\n"
             f"Theme: {theme}\n"
-            f"Tempo: {tempo} BPM\n"
+            f"Instruments: {instruments}\n"
             f"Music prompt: {prompt}\n\n"
-            "Use this structure exactly: [Verse 1], [Chorus], [Verse 2], [Chorus]. "
-            "Avoid quoting or imitating existing songs."
+            "Strict rules:\n"
+            f"- Lyrics must fit inside {duration} seconds.\n"
+            f"- Maximum lines: {max_lines}\n"
+            "- Use section labels.\n"
+            "- Do not write one paragraph.\n"
+            "- Do not write a full song for a short preview.\n"
+            "- Keep every line short and singable.\n"
+            "- Return only formatted lyrics.\n\n"
+            "Required format:\n\n"
+            "[Verse 1]\n"
+            "Line one\n"
+            "Line two\n"
+            "Line three\n"
+            "Line four\n\n"
+            "[Chorus]\n"
+            "Line one\n"
+            "Line two\n"
+            "Line three\n"
+            "Line four\n\n"
+            "No explanation. Avoid quoting or imitating existing songs."
         ),
         expected_output=(
-            "Original lyrics with section labels [Verse 1], [Chorus], [Verse 2], [Chorus]."
+            f"Original formatted lyrics with section labels and no more than {max_lines} lines."
         ),
         agent=agent,
     )
