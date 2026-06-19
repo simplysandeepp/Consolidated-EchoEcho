@@ -6,6 +6,7 @@ pydub==0.25.1
 transformers
 torch
 soundfile
+gradio_client
 numpy
 scipy
 pytest==8.3.4

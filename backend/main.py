@@ -18,7 +18,7 @@ from typing import Any, Literal
 
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
@@ -40,13 +40,14 @@ from .music_generator import (
     generate_music,
     load_model,
 )
-from .auth import AuthError, login as auth_login, signup as auth_signup, user_email_for_token
+from .auth import AuthError, login as auth_login, signup as auth_signup, user_email_for_token, user_name_for_email
 from .composer import compose_song
 from .transcriber import TranscriptionError, transcribe_audio
 from .agents.lyrics_agent import generate_lyrics as generate_agent_lyrics
 from .agents.copyright_agent.main import check_copyright
 from .agents.copyright_agent.models.request_model import CopyrightCheckRequest
 from .ace_step_generator import generate_with_ace_step
+from .sheet_generator.music_sheet import _choose_chords, _choose_key
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -56,6 +57,7 @@ GENERATED_DIR = BASE_DIR / "generated"
 STATIC_DIR = BASE_DIR / "static"
 DATA_DIR = PROJECT_DIR / "data"
 USER_DATA_DIR = DATA_DIR / "users"
+USER_STATE_FILE = DATA_DIR / "library_state.json"
 DEFAULT_HISTORY_FILE = BASE_DIR / "song_history.json"
 HISTORY_FILE = DEFAULT_HISTORY_FILE
 CALLBACK_FILE = BASE_DIR / "kiai_callbacks.json"
@@ -201,6 +203,9 @@ def ensure_files() -> None:
     GENERATED_DIR.mkdir(parents=True, exist_ok=True)
     STATIC_DIR.mkdir(parents=True, exist_ok=True)
     USER_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    if not USER_STATE_FILE.exists():
+        USER_STATE_FILE.write_text(json.dumps({"users": {}, "songs": {}}, indent=2), encoding="utf-8")
     default_user_file = user_songs_path(DEFAULT_USER_ID)
     if not default_user_file.exists():
         legacy_history = []
@@ -232,6 +237,24 @@ def read_json_list(path: Path) -> list[dict[str, Any]]:
 def write_json_list(path: Path, data: list[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+
+def read_user_state() -> dict[str, Any]:
+    ensure_files()
+    try:
+        data = json.loads(USER_STATE_FILE.read_text(encoding="utf-8") or "{}")
+    except json.JSONDecodeError:
+        data = {}
+    if not isinstance(data, dict):
+        data = {}
+    users = data.get("users") if isinstance(data.get("users"), dict) else {}
+    songs = data.get("songs") if isinstance(data.get("songs"), dict) else {}
+    return {"users": users, "songs": songs}
+
+
+def write_user_state(state: dict[str, Any]) -> None:
+    USER_STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    USER_STATE_FILE.write_text(json.dumps(state, indent=2), encoding="utf-8")
 
 
 def sanitize_user_id(user_id: str) -> str:
@@ -271,7 +294,76 @@ def generate_song_id(existing_ids: set[str] | None = None) -> str:
     raise RuntimeError("Could not create a unique song ID.")
 
 
-def save_user_song(user_id: str, song_data: dict[str, Any]) -> dict[str, Any]:
+def library_song_summary(record: dict[str, Any], owner_email: str = "") -> dict[str, Any]:
+    song = with_urls(record)
+    return {
+        "songId": song.get("song_id"),
+        "song_id": song.get("song_id"),
+        "id": song.get("id"),
+        "ownerEmail": owner_email,
+        "title": song.get("title"),
+        "provider": provider_label(str(song.get("mode") or "")),
+        "mode": song.get("mode"),
+        "audioUrl": song.get("audio_url"),
+        "audio_url": song.get("audio_url"),
+        "duration": song.get("duration"),
+        "mood": song.get("mood") or song.get("mood_tag") or "",
+        "genre": song.get("genre") or song.get("style") or "",
+        "bpm": song.get("bpm") or song.get("tempo"),
+        "key": song.get("key"),
+        "chords": song.get("chords") or [],
+        "musicSheet": (song.get("sheet") or {}).get("musicSheet") or [],
+        "lyrics": (song.get("sheet") or {}).get("lyrics"),
+        "createdAt": song.get("created_at"),
+        "created_at": song.get("created_at"),
+    }
+
+
+def remember_user_song(user_email: str, user_name: str, record: dict[str, Any]) -> None:
+    email = user_email.strip().lower()
+    if not email:
+        return
+    song_id = record_code(record)
+    if not song_id:
+        return
+    state = read_user_state()
+    users = state["users"]
+    songs = state["songs"]
+    user_entry = users.setdefault(email, {"name": user_name or email.split("@")[0], "email": email, "songIds": []})
+    user_entry["name"] = user_name or user_entry.get("name") or email.split("@")[0]
+    user_entry["email"] = email
+    song_ids = user_entry.setdefault("songIds", [])
+    if song_id not in song_ids:
+        song_ids.append(song_id)
+    songs[song_id] = library_song_summary(record, email)
+    write_user_state(state)
+
+
+def remember_user_profile(user_email: str, user_name: str, song_ids: list[str] | None = None) -> None:
+    email = user_email.strip().lower()
+    if not email:
+        return
+    state = read_user_state()
+    user_entry = state["users"].setdefault(email, {"name": user_name or email.split("@")[0], "email": email, "songIds": []})
+    user_entry["name"] = user_name or user_entry.get("name") or email.split("@")[0]
+    user_entry["email"] = email
+    if song_ids is not None:
+        existing = list(user_entry.get("songIds") or [])
+        for song_id in song_ids:
+            if song_id and song_id not in existing:
+                existing.append(song_id)
+        user_entry["songIds"] = existing
+    write_user_state(state)
+
+
+def save_user_song(
+    user_id: str,
+    song_data: dict[str, Any],
+    *,
+    user_email: str = "",
+    user_name: str = "",
+) -> dict[str, Any]:
+    attach_sheet(song_data)
     songs = load_user_songs(user_id)
     existing_ids = {record_code(song) for song in songs}
     song_id = record_code(song_data)
@@ -293,6 +385,7 @@ def save_user_song(user_id: str, song_data: dict[str, Any]) -> dict[str, Any]:
     song_data.setdefault("lyrics", "")
     songs.append(song_data)
     write_user_songs(user_id, songs)
+    remember_user_song(user_email, user_name, song_data)
     return song_data
 
 
@@ -310,6 +403,14 @@ def current_user_id(request: Request | None) -> str:
     if email:
         return user_id_from_email(email)
     return DEFAULT_USER_ID
+
+
+def current_user_email(request: Request | None) -> str:
+    return user_email_for_token(auth_token_from_request(request)) or DEFAULT_USER_EMAIL
+
+
+def current_user_name(request: Request | None) -> str:
+    return user_name_for_email(current_user_email(request))
 
 
 def iter_user_song_files() -> list[Path]:
@@ -468,6 +569,111 @@ def add_agent_sections(record: dict[str, Any], request: GenerateRequest, prompt:
     record["copyright"] = generate_copyright_section(lyrics["text"], lyrics_available)
 
 
+def provider_label(mode: str | None) -> str:
+    labels = {
+        "api": "KIE.AI",
+        "kie-vocal": "KIE.AI",
+        "ace-step": "Ace AI",
+        "musicgen": "MusicGen",
+    }
+    return labels.get((mode or "musicgen").strip().lower(), mode or "MusicGen")
+
+
+def has_real_lyrics(record: dict[str, Any]) -> bool:
+    lyrics = record.get("lyrics")
+    if isinstance(lyrics, dict):
+        text = str(lyrics.get("text") or "").strip()
+        structure = str(lyrics.get("structure") or "").strip().lower()
+    else:
+        text = str(lyrics or "").strip()
+        structure = ""
+    if not text:
+        return False
+    if structure == "unavailable":
+        return False
+    if text.startswith(LYRICS_FALLBACK):
+        return False
+    return True
+
+
+def one_verse_lyrics(record: dict[str, Any]) -> dict[str, str] | None:
+    if not has_real_lyrics(record):
+        return None
+    lyrics = record.get("lyrics")
+    text = str(lyrics.get("text") if isinstance(lyrics, dict) else lyrics or "").strip()
+    lines: list[str] = []
+    collecting = False
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            if collecting and lines:
+                break
+            continue
+        if line.startswith("[") and line.endswith("]"):
+            if collecting and lines:
+                break
+            collecting = "verse" in line.lower() or not lines
+            continue
+        if collecting or not lines:
+            lines.append(line)
+        if len(lines) >= 6:
+            break
+    verse = "\n".join(lines).strip() or text
+    return {"label": "Verse", "text": verse}
+
+
+def build_music_sheet_lines(record: dict[str, Any], chords: list[str]) -> list[str]:
+    instruments = record.get("instruments") or []
+    if isinstance(instruments, list):
+        instrument_text = ", ".join(str(item) for item in instruments if str(item).strip())
+    else:
+        instrument_text = str(instruments or "").strip()
+    instrument_text = instrument_text or "lead melody, chords, bass, and light rhythm"
+    chord_text = " - ".join(chords)
+    return [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with " + instrument_text,
+        "Main chord movement: " + chord_text,
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip",
+    ]
+
+
+def attach_sheet(record: dict[str, Any]) -> None:
+    try:
+        mood = str(record.get("mood") or record.get("mood_tag") or "Selected mood")
+        genre = str(record.get("genre") or record.get("style") or "Selected style")
+        key = str(record.get("key") or _choose_key(mood, genre))
+        chords = record.get("chords")
+        if not isinstance(chords, list) or not chords:
+            chords = _choose_chords(mood)
+        chords = [str(chord) for chord in chords if str(chord).strip()]
+        sheet = {
+            "title": record_title(record),
+            "provider": provider_label(str(record.get("mode") or "")),
+            "mood": mood,
+            "genre": genre,
+            "bpm": record.get("bpm") or record.get("tempo") or 90,
+            "key": key,
+            "chords": chords,
+            "musicSheet": build_music_sheet_lines(record, chords),
+        }
+        lyrics = one_verse_lyrics(record)
+        if lyrics:
+            sheet["lyrics"] = lyrics
+        record["sheet"] = sheet
+        record["sheetAvailable"] = True
+        record["lyricsAvailable"] = bool(lyrics)
+        record["chords"] = chords
+        record["key"] = key
+    except Exception as exc:
+        logger.warning("Sheet generation failed for %s: %s", record_code(record), exc)
+        record["sheet"] = None
+        record["sheetAvailable"] = False
+        record["lyricsAvailable"] = False
+        record["sheet_error"] = "Sheet could not be generated for this inspiration."
+
+
 def normalize_mode(value: str | None) -> str:
     mode = (value or "musicgen").strip().lower()
     if mode not in {"api", "musicgen", "ace-step"}:
@@ -533,12 +739,18 @@ def audio_duration_seconds(path: Path, fallback_seconds: int | float | None = No
 
 def record_title(record: dict[str, Any]) -> str:
     title = str(record.get("title") or "").strip()
-    if title:
-        return title
-    mood = str(record.get("mood") or "").strip()
+    code = record_code(record)
+    mood = str(record.get("mood") or record.get("mood_tag") or "").strip()
     theme = str(record.get("theme") or "").strip()
     style = str(record.get("style") or record.get("genre") or "").strip()
     parts = [part for part in (mood, theme or style) if part]
+    generic_title = " Â· ".join(parts)
+    too_generic = title.lower() in {"dreamy Â· inspiration", "dreamy · inspiration", "generated track"}
+    if title and title != generic_title and not too_generic:
+        return title
+    if code:
+        prefix = "Inspiration" if record.get("mode") == "api" else "Song"
+        return f"{prefix} {code}"
     return " · ".join(parts) or "Generated Track"
 
 
@@ -595,6 +807,7 @@ def find_history_record(code: str, user_id: str = DEFAULT_USER_ID) -> tuple[list
 
 
 def with_urls(record: dict[str, Any]) -> dict[str, Any]:
+    attach_sheet(record)
     code = record_code(record)
     original = original_filename(record)
     trimmed = trimmed_filename(record)
@@ -623,6 +836,9 @@ def with_urls(record: dict[str, Any]) -> dict[str, Any]:
         "download_url": f"/download/{code}/original" if code else None,
         "trimmed_audio_url": trimmed_url,
         "trimmed_download_url": f"/download/{code}/trimmed" if trimmed else None,
+        "sheetAvailable": bool(record.get("sheetAvailable")),
+        "lyricsAvailable": bool(record.get("lyricsAvailable")),
+        "sheet": record.get("sheet"),
     }
 
 
@@ -641,6 +857,9 @@ def unified_response(record: dict[str, Any]) -> dict[str, Any]:
         "output_file": song.get("output_file") or (f"generated/{song['filename']}" if song.get("filename") else None),
         "download_filename": song.get("filename"),
         "lyrics": song.get("lyrics"),
+        "lyricsAvailable": bool(song.get("lyricsAvailable")),
+        "sheetAvailable": bool(song.get("sheetAvailable")),
+        "sheet": song.get("sheet"),
         "copyright": song.get("copyright"),
         "song": song,
         "record": song,
@@ -745,7 +964,13 @@ def api_input_from_request(request: GenerateRequest) -> ApiGenerationInput:
     )
 
 
-async def generate_with_api(request: GenerateRequest, user_id: str = DEFAULT_USER_ID) -> dict[str, Any]:
+async def generate_with_api(
+    request: GenerateRequest,
+    user_id: str = DEFAULT_USER_ID,
+    *,
+    user_email: str = "",
+    user_name: str = "",
+) -> dict[str, Any]:
     reset_generation_status(60)
     update_generation_status("Submitting API generation", 10)
     try:
@@ -768,8 +993,10 @@ async def generate_with_api(request: GenerateRequest, user_id: str = DEFAULT_USE
             genre=generated.get("style") or request.style or first_or_join(request.genres, ""),
             bpm=generated.get("tempo") or request.tempo,
         )
-        add_agent_sections(generated, request, str(generated.get("prompt") or ""))
-        save_user_song(user_id, generated)
+        generated["lyrics"] = None
+        generated["copyright"] = copyright_unavailable("No real lyrics were returned for this KIE.AI inspiration.")
+        attach_sheet(generated)
+        save_user_song(user_id, generated, user_email=user_email, user_name=user_name)
         update_generation_status("Completed", 100)
         return unified_response(generated)
     except KieAIConfigError as exc:
@@ -786,7 +1013,13 @@ async def generate_with_api(request: GenerateRequest, user_id: str = DEFAULT_USE
         raise HTTPException(status_code=500, detail="API song generation failed. Please try again.") from exc
 
 
-def generate_with_musicgen(request: GenerateRequest, user_id: str = DEFAULT_USER_ID) -> dict[str, Any]:
+def generate_with_musicgen(
+    request: GenerateRequest,
+    user_id: str = DEFAULT_USER_ID,
+    *,
+    user_email: str = "",
+    user_name: str = "",
+) -> dict[str, Any]:
     total_start = time.perf_counter()
     reset_generation_status()
     update_generation_status("Preparing prompt", 0)
@@ -873,13 +1106,21 @@ def generate_with_musicgen(request: GenerateRequest, user_id: str = DEFAULT_USER
         genre=record.get("style") or first_or_join(request.genres, ""),
         bpm=request.tempo,
     )
-    add_agent_sections(record, request, prompt)
-    save_user_song(user_id, record)
+    record["lyrics"] = None
+    record["copyright"] = copyright_unavailable("MusicGen does not produce lyrics for this instrumental inspiration.")
+    attach_sheet(record)
+    save_user_song(user_id, record, user_email=user_email, user_name=user_name)
     update_generation_status("Completed", 100)
     return unified_response(record)
 
 
-async def generate_with_ace_step_mode(request: GenerateRequest, user_id: str = DEFAULT_USER_ID) -> dict[str, Any]:
+async def generate_with_ace_step_mode(
+    request: GenerateRequest,
+    user_id: str = DEFAULT_USER_ID,
+    *,
+    user_email: str = "",
+    user_name: str = "",
+) -> dict[str, Any]:
     reset_generation_status(600)
     update_generation_status("Generating lyrics for ACE-Step", 10)
     try:
@@ -953,12 +1194,18 @@ async def generate_with_ace_step_mode(request: GenerateRequest, user_id: str = D
             genre=style,
             bpm=request.tempo,
         )
-        save_user_song(user_id, record)
+        attach_sheet(record)
+        save_user_song(user_id, record, user_email=user_email, user_name=user_name)
         update_generation_status("Completed", 100)
         return unified_response(record)
     except Exception as exc:
         update_generation_status("Failed", 100)
         logger.exception("ACE-Step generation failed")
+        if "gradio_client" in str(exc):
+            raise HTTPException(
+                status_code=503,
+                detail="ACE-Step dependency gradio_client is missing. Install requirements.txt and restart the server.",
+            ) from exc
         detail = (
             f"ACE-Step HuggingFace Space is unavailable — it may be sleeping. "
             f"Try again in a few minutes. ({exc})"
@@ -1070,6 +1317,8 @@ async def kie_vocal_generate(request: KieVocalRequest, http_request: Request) ->
     update_generation_status("Submitting vocal request to Kie.ai", 8)
     try:
         user_id = current_user_id(http_request)
+        user_email = current_user_email(http_request)
+        user_name = current_user_name(http_request)
         history = read_history(user_id)
         existing_ids = {record_code(item) for item in history}
 
@@ -1110,10 +1359,13 @@ async def kie_vocal_generate(request: KieVocalRequest, http_request: Request) ->
             genre=request.genre or generated.get("style") or "",
             bpm=request.bpm,
         )
+        real_lyrics = one_verse_lyrics(generated)
+        generated["lyricsAvailable"] = bool(real_lyrics)
+        attach_sheet(generated)
 
-        save_user_song(user_id, generated)
+        save_user_song(user_id, generated, user_email=user_email, user_name=user_name)
         update_generation_status("Done", 100)
-        return {"ok": True, "track": generated}
+        return {"ok": True, "track": with_urls(generated)}
 
     except KieAIConfigError as exc:
         update_generation_status("Failed", 100)
@@ -1146,19 +1398,26 @@ async def api_transcribe(file: UploadFile = File(...)) -> dict[str, Any]:
 @app.post("/generate")
 async def generate(request: GenerateRequest, http_request: Request) -> dict[str, Any]:
     user_id = current_user_id(http_request)
+    user_email = current_user_email(http_request)
+    user_name = current_user_name(http_request)
     mode = normalize_mode(request.mode)
     if mode == "api":
-        return await generate_with_api(request, user_id)
+        return await generate_with_api(request, user_id, user_email=user_email, user_name=user_name)
     if mode == "ace-step":
-        return await generate_with_ace_step_mode(request, user_id)
-    return generate_with_musicgen(request, user_id)
+        return await generate_with_ace_step_mode(request, user_id, user_email=user_email, user_name=user_name)
+    return generate_with_musicgen(request, user_id, user_email=user_email, user_name=user_name)
 
 
 @app.post("/api/generate")
 async def api_generate(request: GenerateRequest, http_request: Request) -> dict[str, Any]:
     request.mode = "api"
     request.fast = True
-    return await generate_with_api(request, current_user_id(http_request))
+    return await generate_with_api(
+        request,
+        current_user_id(http_request),
+        user_email=current_user_email(http_request),
+        user_name=current_user_name(http_request),
+    )
 
 
 @app.post("/generate-inspiration")
@@ -1216,6 +1475,24 @@ def history(request: Request) -> dict[str, Any]:
     return {"songs": list(reversed(records))}
 
 
+@app.get("/api/library")
+def api_library(request: Request) -> dict[str, Any]:
+    records = [with_urls(item) for item in read_history(current_user_id(request))]
+    songs = list(reversed(records))
+    email = current_user_email(request)
+    song_ids = [record_code(song) for song in songs if record_code(song)]
+    remember_user_profile(email, current_user_name(request), song_ids)
+    return {
+        "ok": True,
+        "user": {
+            "name": current_user_name(request),
+            "email": email,
+            "songIds": song_ids,
+        },
+        "songs": songs,
+    }
+
+
 @app.get("/songs")
 def songs(request: Request) -> dict[str, Any]:
     return history(request)
@@ -1263,6 +1540,47 @@ def song(song_id: str, request: Request) -> dict[str, Any]:
     if record:
         return {"song": with_urls(record)}
     raise HTTPException(status_code=404, detail="Song not found")
+
+
+@app.get("/api/song/{song_id}")
+def api_song(song_id: str, request: Request) -> dict[str, Any]:
+    _, record = find_history_record(song_id, current_user_id(request))
+    if record:
+        return {"ok": True, "song": with_urls(record)}
+    raise HTTPException(status_code=404, detail="Song not found")
+
+
+@app.get("/api/song/{song_id}/lyrics-sheet")
+def api_song_lyrics_sheet(song_id: str, request: Request) -> Response:
+    _, record = find_history_record(song_id, current_user_id(request))
+    if not record:
+        raise HTTPException(status_code=404, detail="Song not found")
+    song_record = with_urls(record)
+    sheet = song_record.get("sheet") or {}
+    lyrics = sheet.get("lyrics") if isinstance(sheet.get("lyrics"), dict) else None
+    if not lyrics or not str(lyrics.get("text") or "").strip():
+        raise HTTPException(status_code=404, detail="Lyrics sheet is not available for this song.")
+    title = record_title(song_record)
+    lines = [
+        "EchoEcho Lyrics Sheet",
+        "",
+        f"Title: {title}",
+        f"Provider: {sheet.get('provider') or provider_label(str(song_record.get('mode') or ''))}",
+        f"Mood: {sheet.get('mood') or song_record.get('mood') or ''}",
+        f"Genre: {sheet.get('genre') or song_record.get('genre') or ''}",
+        f"BPM: {sheet.get('bpm') or song_record.get('bpm') or ''}",
+        "",
+        f"[{lyrics.get('label') or 'Verse'}]",
+        str(lyrics.get("text") or "").strip(),
+        "",
+        "Chords: " + " - ".join(sheet.get("chords") or song_record.get("chords") or []),
+    ]
+    safe_title = "".join(ch.lower() if ch.isalnum() else "_" for ch in title).strip("_") or song_id
+    return Response(
+        "\n".join(lines),
+        media_type="text/plain",
+        headers={"Content-Disposition": f'attachment; filename="echoecho_{safe_title}_lyrics_sheet.txt"'},
+    )
 
 
 @app.post("/api/library/{code}/trim")

@@ -291,19 +291,23 @@
     document.getElementById('fieldBio').value   = bio;
 
     // Stats
-    const tracks = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
-    document.getElementById('statTracks').textContent = tracks.length;
+    let tracks = [];
+    const token = localStorage.getItem('echo_auth_token');
+    fetch('/api/library', token ? { headers: { 'Authorization': 'Bearer ' + token } } : {})
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        tracks = data && Array.isArray(data.songs) ? data.songs : [];
+        document.getElementById('statTracks').textContent = tracks.length;
+      })
+      .catch(() => {
+        document.getElementById('statTracks').textContent = '0';
+      });
+    document.getElementById('statTracks').textContent = '0';
 
     const memberSince = localStorage.getItem('echo_member_since');
     if(memberSince){
       const days = Math.max(1, Math.floor((Date.now() - parseInt(memberSince)) / 86400000));
       document.getElementById('statDays').textContent = days;
-    } else if(tracks.length > 0){
-      const sorted = tracks.filter(t => t.created_at).sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
-      if(sorted.length > 0){
-        const days = Math.max(1, Math.floor((Date.now() - new Date(sorted[0].created_at)) / 86400000));
-        document.getElementById('statDays').textContent = days;
-      }
     }
   })();
 

@@ -33,5 +33,266 @@
       "artist": "",
       "details": "No strong evidence of existing lyrics."
     }
+  },
+  {
+    "code": "VGOV",
+    "song_id": "VGOV",
+    "task_id": "6234fc9be1603075b8ab0fcb0ccd7bc9",
+    "created_at": "2026-06-19T10:16:56.736164+00:00",
+    "mood": "Calm, Cool",
+    "theme": "Fantasy, Mountain",
+    "style": "Acoustic, Layered",
+    "instruments": [
+      "Piano, Flute"
+    ],
+    "tempo": 80,
+    "energy": 7,
+    "original_audio_filename": "ECHO_VGOV_vocal.mp3",
+    "audio_source_url": "https://tempfile.aiquickdraw.com/r/d513f234efed4c779a5ee2a6eb6bd2ac.mp3",
+    "trimmed_audio_filename": "ECHO_VGOV_vocal_60s.mp3",
+    "mode": "kie-vocal",
+    "filename": "ECHO_VGOV_vocal.mp3",
+    "audio_filename": "ECHO_VGOV_vocal.mp3",
+    "genre": "Jazz, Lo-fi",
+    "mood_tag": "Calm, Cool",
+    "bpm": 80,
+    "id": "VGOV",
+    "title": "Calm, Cool \u00b7 Fantasy, Mountain",
+    "duration": 214,
+    "audio_path": "generated/ECHO_VGOV_vocal.mp3",
+    "audio_url": "/generated/ECHO_VGOV_vocal.mp3",
+    "output_file": "generated/ECHO_VGOV_vocal.mp3",
+    "lyricsAvailable": false,
+    "sheet": {
+      "title": "Calm, Cool \u00b7 Fantasy, Mountain",
+      "provider": "KIE.AI",
+      "mood": "Calm, Cool",
+      "genre": "Jazz, Lo-fi",
+      "bpm": 80,
+      "key": "G",
+      "chords": [
+        "C",
+        "Am",
+        "F",
+        "G"
+      ],
+      "musicSheet": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with Piano, Flute",
+        "Main chord movement: C - Am - F - G",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ]
+    },
+    "sheetAvailable": true,
+    "chords": [
+      "C",
+      "Am",
+      "F",
+      "G"
+    ],
+    "key": "G",
+    "lyrics": ""
+  },
+  {
+    "code": "GXID",
+    "song_id": "GXID",
+    "task_id": "995c4fab9f735bba976ddf33a557a50b",
+    "created_at": "2026-06-19T10:48:32.059725+00:00",
+    "mood": "Melancholy",
+    "theme": "Mountain, Nature, Peace",
+    "style": "Acoustic, Layered, Lo-fi Mixed",
+    "instruments": [
+      "Synth, Violin, Flute"
+    ],
+    "tempo": 90,
+    "energy": 7,
+    "original_audio_filename": "ECHO_GXID_vocal.mp3",
+    "audio_source_url": "https://tempfile.aiquickdraw.com/r/6a0fa331a2664f59bb40eb9f76871274.mp3",
+    "trimmed_audio_filename": null,
+    "mode": "kie-vocal",
+    "filename": "ECHO_GXID_vocal.mp3",
+    "audio_filename": "ECHO_GXID_vocal.mp3",
+    "genre": "Ambient",
+    "mood_tag": "Melancholy",
+    "bpm": 90,
+    "id": "GXID",
+    "title": "Song GXID",
+    "duration": 60,
+    "audio_path": "generated/ECHO_GXID_vocal.mp3",
+    "audio_url": "/generated/ECHO_GXID_vocal.mp3",
+    "output_file": "generated/ECHO_GXID_vocal.mp3",
+    "lyricsAvailable": false,
+    "sheet": {
+      "title": "Song GXID",
+      "provider": "KIE.AI",
+      "mood": "Melancholy",
+      "genre": "Ambient",
+      "bpm": 90,
+      "key": "D",
+      "chords": [
+        "C",
+        "Am",
+        "F",
+        "G"
+      ],
+      "musicSheet": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with Synth, Violin, Flute",
+        "Main chord movement: C - Am - F - G",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ]
+    },
+    "sheetAvailable": true,
+    "chords": [
+      "C",
+      "Am",
+      "F",
+      "G"
+    ],
+    "key": "D",
+    "lyrics": ""
+  },
+  {
+    "mode": "ace-step",
+    "code": "UDFC",
+    "song_id": "UDFC",
+    "created_at": "2026-06-19T10:50:02.414257+00:00",
+    "prompt": "energetic rock, 90bpm, inspiration",
+    "mood": "energetic",
+    "theme": "inspiration",
+    "style": "rock",
+    "instruments": [
+      "strings"
+    ],
+    "tempo": 90,
+    "complexity": "Moderate",
+    "duration": 30,
+    "energy": 5,
+    "filename": "ECHO_UDFC_ace.mp3",
+    "audio_filename": "ECHO_UDFC_ace.mp3",
+    "original_audio_filename": "ECHO_UDFC_ace.mp3",
+    "output_file": "generated/ECHO_UDFC_ace.mp3",
+    "audio_url": "/generated/ECHO_UDFC_ace.mp3",
+    "lyrics": {
+      "text": "[verse]\nRise up, let the darkness fade\nA new dawn breaks, a brand new shade\nWe'll chase the shadows, we'll take the stage\nOur hearts ablaze, our spirits engage\n\n[chorus]\nWe'll light up the night, we'll make it feel alive\nElectric energy, our hearts beating as one, we'll thrive\nIn this moment, we'll never back down\nOur spirits soaring, our voices echoing all around\n\n[verse]\nWe'll take the leap, we'll break the mold\nOur dreams are calling, our hearts are bold\nWe'll chase the sun, we'll never look back\nOur hearts on fire, our souls on the attack\n\n[chorus]\nWe'll light up the night, we'll make it feel alive\nElectric energy, our hearts beating as one, we'll thrive\nIn this moment, we'll never back down\nOur spirits soaring, our voices echoing all around\n\n[bridge]\nIn the silence, we'll find our voice\nA whispered scream, a heartfelt choice\nTo rise above, to shine so bright\nOur true selves, in this moment, take flight\n\n[chorus]\nWe'll light up the night, we'll make it feel alive\nElectric energy, our hearts beating as one, we'll thrive\nIn this moment, we'll never back down\nOur spirits soaring, our voices echoing all around",
+      "structure": "user-provided"
+    },
+    "copyright": {
+      "status": "safe",
+      "similarity_score": 0.91,
+      "notes": "Appears original.",
+      "matches": [],
+      "risk": "None",
+      "copyright_status": "Unknown",
+      "song_title": "",
+      "artist": "",
+      "details": "No strong evidence of existing lyrics."
+    },
+    "id": "UDFC",
+    "title": "Song UDFC",
+    "genre": "rock",
+    "bpm": 90,
+    "audio_path": "generated/ECHO_UDFC_ace.mp3",
+    "sheet": {
+      "title": "Song UDFC",
+      "provider": "Ace AI",
+      "mood": "energetic",
+      "genre": "rock",
+      "bpm": 90,
+      "key": "F",
+      "chords": [
+        "C",
+        "Am",
+        "F",
+        "G"
+      ],
+      "musicSheet": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with strings",
+        "Main chord movement: C - Am - F - G",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ],
+      "lyrics": {
+        "label": "Verse",
+        "text": "Rise up, let the darkness fade\nA new dawn breaks, a brand new shade\nWe'll chase the shadows, we'll take the stage\nOur hearts ablaze, our spirits engage"
+      }
+    },
+    "sheetAvailable": true,
+    "lyricsAvailable": true,
+    "chords": [
+      "C",
+      "Am",
+      "F",
+      "G"
+    ],
+    "key": "F"
+  },
+  {
+    "mode": "musicgen",
+    "code": "TXRT",
+    "song_id": "TXRT",
+    "created_at": "2026-06-19T11:00:52.884379+00:00",
+    "prompt": "30-second instrumental inspiration sketch. soft-focus, floating, hazy, dreamlike mood. Tempo 68 BPM. Moderate complexity. Energy level 4. Memorable melody. Creative sketch. Suitable for inspiring songwriters.",
+    "mood": "dreamy",
+    "theme": "",
+    "style": "",
+    "instruments": [],
+    "tempo": 68,
+    "complexity": "Moderate",
+    "duration": 30,
+    "energy": 4,
+    "generation_time_seconds": 312,
+    "generation_time": "5m 12s",
+    "filename": "TXRT.wav",
+    "audio_filename": "TXRT.wav",
+    "output_file": "generated/TXRT.wav",
+    "audio_url": "/generated/TXRT.wav",
+    "inference_seconds": 311.79,
+    "id": "TXRT",
+    "title": "Song TXRT",
+    "genre": "",
+    "bpm": 68,
+    "audio_path": "generated/TXRT.wav",
+    "original_audio_filename": "TXRT.wav",
+    "lyrics": null,
+    "copyright": {
+      "status": "unavailable",
+      "similarity_score": null,
+      "notes": "MusicGen does not produce lyrics for this instrumental inspiration.",
+      "matches": []
+    },
+    "sheet": {
+      "title": "Song TXRT",
+      "provider": "MusicGen",
+      "mood": "dreamy",
+      "genre": "Selected style",
+      "bpm": 68,
+      "key": "C",
+      "chords": [
+        "Am",
+        "Fmaj7",
+        "C",
+        "G"
+      ],
+      "musicSheet": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with lead melody, chords, bass, and light rhythm",
+        "Main chord movement: Am - Fmaj7 - C - G",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ]
+    },
+    "sheetAvailable": true,
+    "lyricsAvailable": false,
+    "chords": [
+      "Am",
+      "Fmaj7",
+      "C",
+      "G"
+    ],
+    "key": "C"
   }
 ]

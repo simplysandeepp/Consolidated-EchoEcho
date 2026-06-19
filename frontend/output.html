@@ -290,6 +290,50 @@
       -webkit-text-fill-color: transparent;
     }
     .lyr-line.sung .lyr-text { color: var(--grey71); }
+    .sheet-panel {
+      padding: 1rem 1.375rem 1.25rem;
+      border-bottom: 1px solid rgba(13,13,13,.06);
+      background: #fff;
+    }
+    .sheet-title {
+      font-size: .68rem; font-weight: 700; letter-spacing: .07em;
+      text-transform: uppercase; color: var(--grey71); margin-bottom: .85rem;
+    }
+    .sheet-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .35rem .75rem;
+      margin-bottom: .75rem;
+      color: var(--grey71);
+      font-size: .78rem;
+      font-weight: 600;
+    }
+    .sheet-meta {
+      min-width: 0;
+    }
+    .sheet-meta span {
+      display: inline;
+      font-size: .66rem;
+      font-weight: 700;
+      color: var(--grey71);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-right: .25rem;
+    }
+    .sheet-meta strong { font-size: .78rem; font-weight: 700; overflow-wrap: anywhere; color: var(--dark); }
+    .sheet-list {
+      margin: 0;
+      padding-left: 1.1rem;
+      color: var(--dark);
+      font-size: .9rem;
+      line-height: 1.5;
+    }
+    .sheet-error {
+      font-size: .9rem;
+      color: var(--grey71);
+      padding: 1.375rem;
+      border-bottom: 1px solid rgba(13,13,13,.06);
+    }
 
     /* ── ACTION ROW ────────────────────────────────────── */
     .actions-row {
@@ -370,8 +414,8 @@
   <div class="container">
 
     <div id="empty-state" class="empty-state" style="display:none">
-      <h2>No track to show yet</h2>
-      <p>Create an inspo from your dashboard and Echo Echo will compose a song for you.</p>
+      <h2>Could not load this inspiration.</h2>
+      <p>Please try again from your library.</p>
       <a class="bl-dark-btn primary" href="dashboard.html">Go to Dashboard</a>
     </div>
 
@@ -415,8 +459,15 @@
           <span class="chord-strip-label">Chords</span>
         </div>
 
+        <div class="sheet-panel" id="sheet-panel" style="display:none">
+          <div class="sheet-title">Music Sheet</div>
+          <div class="sheet-grid" id="sheet-meta"></div>
+          <ul class="sheet-list" id="sheet-list"></ul>
+        </div>
+        <div class="sheet-error" id="sheet-error" style="display:none">Sheet could not be generated for this inspiration.</div>
+
         <div class="lyrics-panel" id="lyrics-panel">
-          <div class="lyrics-title">♪ Lyrics &amp; Chords <span id="lyrics-source" style="font-weight:500;text-transform:none;letter-spacing:0"></span></div>
+          <div class="lyrics-title">Lyrics <span id="lyrics-source" style="font-weight:500;text-transform:none;letter-spacing:0"></span></div>
           <div id="lyrics-body"></div>
         </div>
       </section>
@@ -427,7 +478,7 @@
         <button class="bl-dark-btn primary" id="save-btn" onclick="saveToLibrary()">
           <span>♥</span> Save to Library
         </button>
-        <button class="bl-ghost-btn" onclick="downloadTrack()">
+        <button class="bl-ghost-btn" id="audio-download-btn" onclick="downloadTrack()">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
           </svg>
@@ -483,25 +534,38 @@
     return sections.filter((section) => section.lines.length);
   }
 
+  function sheetLyrics(raw) {
+    const sheet = raw && raw.sheet ? raw.sheet : {};
+    return sheet && sheet.lyrics && sheet.lyrics.text ? sheet.lyrics : null;
+  }
+
   function normalizeSong(raw) {
     if (!raw) return null;
     const audioUrl = normalizeAudioUrl(raw.audio_url || raw.original_audio_url || raw.audio_path || '');
     const title = raw.title || [raw.mood, raw.theme || raw.genre || raw.style].filter(Boolean).join(' · ') || 'Generated Track';
-    const lyricsText = raw.lyrics && typeof raw.lyrics === 'object' ? raw.lyrics.text : raw.lyrics;
-    let sections = Array.isArray(raw.sections) ? raw.sections : parseLyricsSections(lyricsText);
+    const lyrics = sheetLyrics(raw);
+    const lyricsText = lyrics ? lyrics.text : '';
+    let sections = lyricsText ? parseLyricsSections('[Verse]\n' + lyricsText.replace(/^\s*\[[^\]]+\]\s*/i, '')) : [];
     if (!sections.length) {
       sections = [{ name: audioUrl ? 'Audio' : 'Missing audio', lines: [{ chord: '', text: audioUrl ? 'Studio audio render' : 'Audio file missing for this track' }] }];
     }
+    const id = String(raw.id || raw.song_id || raw.songId || raw.code || '');
+    const genericTitle = !title || /^generated track$/i.test(title) || /dreamy\s*[Â··]\s*inspiration/i.test(title);
     return {
       ...raw,
-      id: String(raw.id || raw.song_id || raw.code || ''),
-      title,
+      id,
+      title: genericTitle && id ? 'Song ' + id : title,
       genre: raw.genre || raw.style || '',
       bpm: raw.bpm || raw.tempo || 90,
       duration: Number(raw.duration || raw.duration_seconds || 0),
       audio_url: audioUrl,
       audio_missing: !audioUrl,
-      chords: Array.isArray(raw.chords) && raw.chords.length ? raw.chords : ['Am', 'F', 'C', 'G'],
+      sheet: raw.sheet || null,
+      sheetAvailable: !!raw.sheetAvailable,
+      lyricsAvailable: !!raw.lyricsAvailable && !!lyrics,
+      lyricsSheet: lyrics,
+      chords: raw.sheet && Array.isArray(raw.sheet.chords) && raw.sheet.chords.length ? raw.sheet.chords : (Array.isArray(raw.chords) && raw.chords.length ? raw.chords : []),
+      key: raw.key || (raw.sheet && raw.sheet.key) || '',
       sections,
       created_at: raw.created_at || raw.date || new Date().toISOString(),
       date: raw.date || raw.created_at || new Date().toISOString(),
@@ -511,7 +575,7 @@
   function readServerTrack(trackId) {
     try {
       const xhr = new XMLHttpRequest();
-      const path = trackId ? '/song/' + encodeURIComponent(trackId) : '/history';
+      const path = trackId ? '/api/song/' + encodeURIComponent(trackId) : '/api/library';
       xhr.open('GET', API_BASE + path, false);
       const token = localStorage.getItem('echo_auth_token');
       if (token) xhr.setRequestHeader('Authorization', 'Bearer ' + token);
@@ -528,33 +592,19 @@
 
   (function loadSong() {
     const params = new URLSearchParams(location.search);
-    const trackId = params.get('track');
+    const trackId = params.get('songId') || params.get('track');
     try {
       if (trackId) {
-        const tracks = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
-        song = normalizeSong(tracks.find((t) => String(t.id) === String(trackId))) || readServerTrack(trackId);
+        song = readServerTrack(trackId);
         fromLibrary = !!song;
       }
       if (!song) {
-        song = normalizeSong(JSON.parse(localStorage.getItem('echo_current_song') || 'null'));
-        if (song) {
-          // generated songs are auto-saved to the library now
-          const saved = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
-          fromLibrary = Array.isArray(saved) && saved.some((t) => t.id === song.id);
-        }
+        song = readServerTrack(null);
+        fromLibrary = !!song;
       }
-      if (!song) {
-        const tracks = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
-        if (Array.isArray(tracks) && tracks.length) {
-          tracks.sort((a, b) => new Date(b.created_at || b.date) - new Date(a.created_at || a.date));
-          song = normalizeSong(tracks[0]);
-          fromLibrary = !!song;
-        }
-      }
-      if (!song) song = readServerTrack(null);
     } catch (e) { song = null; }
 
-    if (!song || !song.sections || !song.sections.length) {
+    if (!song || (song.audio_missing && !song.sheetAvailable && !song.lyricsAvailable)) {
       song = null;
       document.getElementById('empty-state').style.display = '';
       return;
@@ -625,6 +675,13 @@
       saveBtn.onclick = () => { window.location.href = 'dashboard.html'; };
     }
     document.getElementById('download-label').textContent = song.audio_url ? 'Download audio' : 'Download lyric sheet';
+    const audioDownloadBtn = document.getElementById('audio-download-btn');
+    if (audioDownloadBtn) audioDownloadBtn.style.display = song.audio_url ? 'inline-flex' : 'none';
+    if (!song.lyricsAvailable) {
+      vocalsOn = false;
+      document.getElementById('vocals-toggle').classList.remove('on');
+      document.getElementById('vocals-label').textContent = 'Instrumental';
+    }
     if (song.audio_missing) {
       document.getElementById('engine-badge').textContent = 'Audio missing';
       showToast('Audio file missing for this track. Regenerate it to restore playback.');
@@ -632,6 +689,9 @@
     if (song.source && song.source.startsWith('groq/')) {
       document.getElementById('lyrics-source').textContent = '· written by ' + song.source.replace('groq/', '') + ' via Groq';
     }
+
+    renderSheet();
+    ensureLyricsDownloadButton();
 
     // Pills
     const pills = document.getElementById('inspo-pills');
@@ -649,32 +709,94 @@
 
     // Chord strip
     const strip = document.getElementById('chord-strip');
-    (song.chords || []).forEach((chord) => {
-      const chip = document.createElement('span');
-      chip.className = 'chord-chip';
-      chip.dataset.chord = chord;
-      chip.textContent = chord;
-      strip.appendChild(chip);
-    });
+    if (!song.chords || !song.chords.length) {
+      strip.style.display = 'none';
+    } else {
+      strip.style.display = '';
+      (song.chords || []).forEach((chord) => {
+        const chip = document.createElement('span');
+        chip.className = 'chord-chip';
+        chip.dataset.chord = chord;
+        chip.textContent = chord;
+        strip.appendChild(chip);
+      });
+    }
 
     // Lyrics
     const body = document.getElementById('lyrics-body');
-    song.sections.forEach((section, sIdx) => {
-      const sec = document.createElement('div');
-      sec.className = 'lyr-section';
-      sec.innerHTML = `<span class="lyr-section-name">${section.name}</span>`;
-      (section.lines || []).forEach((line, lIdx) => {
-        const row = document.createElement('div');
-        row.className = 'lyr-line';
-        row.id = `lyr-${sIdx}-${lIdx}`;
-        row.innerHTML = `<span class="lyr-chord">${line.chord || ''}</span><span class="lyr-text"></span>`;
-        row.querySelector('.lyr-text').textContent = line.text;
-        sec.appendChild(row);
+    const lyricsPanel = document.getElementById('lyrics-panel');
+    const lyricsTitle = document.querySelector('.lyrics-title');
+    if (lyricsTitle && lyricsTitle.childNodes[0]) lyricsTitle.childNodes[0].nodeValue = 'Lyrics ';
+    if (!song.lyricsAvailable) {
+      lyricsPanel.style.display = 'none';
+    } else {
+      lyricsPanel.style.display = '';
+      song.sections.forEach((section, sIdx) => {
+        const sec = document.createElement('div');
+        sec.className = 'lyr-section';
+        sec.innerHTML = `<span class="lyr-section-name">${section.name}</span>`;
+        (section.lines || []).forEach((line, lIdx) => {
+          const row = document.createElement('div');
+          row.className = 'lyr-line';
+          row.id = `lyr-${sIdx}-${lIdx}`;
+          row.innerHTML = `<span class="lyr-chord">${line.chord || ''}</span><span class="lyr-text"></span>`;
+          row.querySelector('.lyr-text').textContent = line.text;
+          sec.appendChild(row);
+        });
+        body.appendChild(sec);
       });
-      body.appendChild(sec);
-    });
+    }
 
     document.getElementById('time-total').textContent = formatTime(totalSeconds);
+  }
+
+  function renderSheet() {
+    const panel = document.getElementById('sheet-panel');
+    const error = document.getElementById('sheet-error');
+    const sheet = song.sheet || {};
+    if (!song.sheetAvailable || !Array.isArray(sheet.musicSheet) || !sheet.musicSheet.length) {
+      panel.style.display = 'none';
+      error.style.display = song.sheet_error ? '' : 'none';
+      return;
+    }
+    error.style.display = 'none';
+    panel.style.display = '';
+    const meta = document.getElementById('sheet-meta');
+    meta.innerHTML = '';
+    [
+      ['Provider', sheet.provider || song.mode || 'EchoEcho'],
+      ['BPM', sheet.bpm || song.bpm || ''],
+      ['Key', sheet.key || song.key || ''],
+    ].filter((item) => item[1]).forEach(([label, value]) => {
+      const box = document.createElement('div');
+      box.className = 'sheet-meta';
+      box.innerHTML = '<span></span><strong></strong>';
+      box.querySelector('span').textContent = label;
+      box.querySelector('strong').textContent = value;
+      meta.appendChild(box);
+    });
+    const list = document.getElementById('sheet-list');
+    list.innerHTML = '';
+    sheet.musicSheet.forEach((line) => {
+      const item = document.createElement('li');
+      item.textContent = line;
+      list.appendChild(item);
+    });
+  }
+
+  function ensureLyricsDownloadButton() {
+    let btn = document.getElementById('lyrics-download-btn');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.className = 'bl-ghost-btn';
+      btn.id = 'lyrics-download-btn';
+      btn.type = 'button';
+      btn.textContent = 'Download Lyrics Sheet';
+      btn.onclick = downloadLyricsSheet;
+      const actions = document.querySelector('.actions-row');
+      if (actions) actions.insertBefore(btn, actions.lastElementChild);
+    }
+    btn.style.display = song.lyricsAvailable ? 'inline-flex' : 'none';
   }
 
   /* ══ ECHOVOICE PERFORMANCE ENGINE ════════════════════════════════════
@@ -1010,20 +1132,15 @@
 
   /* ── Library / download / next steps ────────────────── */
   function saveToLibrary() {
-    let tracks = [];
-    try { tracks = JSON.parse(localStorage.getItem('echo_tracks') || '[]'); } catch (e) { /* fresh */ }
-    if (!Array.isArray(tracks)) tracks = [];
-    if (!tracks.some((t) => t.id === song.id)) {
-      tracks.unshift(normalizeSong(song));
-      localStorage.setItem('echo_tracks', JSON.stringify(tracks));
-    }
-    localStorage.removeItem('echo_current_song');
-    localStorage.removeItem('echo_pending_inspo');
-    showToast('Saved "' + song.title + '" to your library');
+    showToast('Already saved to your library');
     setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
   }
 
   function downloadTrack() {
+    if (!song.audio_url) {
+      showToast('Audio download is not available for this inspiration.');
+      return;
+    }
     if (song.audio_url) {
       const a = document.createElement('a');
       a.href = /^https?:\/\//i.test(song.audio_url) ? song.audio_url : API_BASE + song.audio_url;
@@ -1048,11 +1165,57 @@
     showToast('Lyric sheet downloaded');
   }
 
+  async function downloadLyricsSheet() {
+    if (!song || !song.lyricsAvailable || !song.lyricsSheet) return;
+    if (song.id) {
+      try {
+        const token = localStorage.getItem('echo_auth_token');
+        const response = await fetch(API_BASE + '/api/song/' + encodeURIComponent(song.id) + '/lyrics-sheet', {
+          headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+        });
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          const safeTitle = (song.title || 'inspiration').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'inspiration';
+          a.href = url;
+          a.download = 'echoecho_' + safeTitle + '_lyrics_sheet.txt';
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 4000);
+          showToast('Lyrics sheet downloaded');
+          return;
+        }
+      } catch (e) { /* fall back to local text below */ }
+    }
+    const sheet = song.sheet || {};
+    const lines = [
+      'EchoEcho Lyrics Sheet',
+      '',
+      'Title: ' + (sheet.title || song.title),
+      'Provider: ' + (sheet.provider || song.mode || 'EchoEcho'),
+      'Mood: ' + (sheet.mood || song.mood || ''),
+      'Genre: ' + (sheet.genre || song.genre || ''),
+      'BPM: ' + (sheet.bpm || song.bpm || ''),
+      '',
+      '[' + (song.lyricsSheet.label || 'Verse') + ']',
+      song.lyricsSheet.text || '',
+      '',
+      'Chords: ' + ((sheet.chords || song.chords || []).join(' - ')),
+    ];
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const safeTitle = (song.title || 'inspiration').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'inspiration';
+    a.href = url;
+    a.download = 'echoecho_' + safeTitle + '_lyrics_sheet.txt';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    showToast('Lyrics sheet downloaded');
+  }
+
   function generateMore() {
     pausePlayback();
-    localStorage.removeItem('echo_pending_inspo');
-    localStorage.setItem('echo_open_create', '1');
-    window.location.href = 'dashboard.html';
+    window.location.href = 'generate.html';
   }
 
   /* ── Toast ──────────────────────────────────────────── */

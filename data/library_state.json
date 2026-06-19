@@ -1,0 +1,116 @@
+{
+  "users": {
+    "test@echo.com": {
+      "name": "Echo Tester",
+      "email": "test@echo.com",
+      "songIds": [
+        "VGOV",
+        "IPLE",
+        "GXID",
+        "UDFC",
+        "TXRT"
+      ]
+    }
+  },
+  "songs": {
+    "GXID": {
+      "songId": "GXID",
+      "song_id": "GXID",
+      "id": "GXID",
+      "ownerEmail": "test@echo.com",
+      "title": "Song GXID",
+      "provider": "KIE.AI",
+      "mode": "kie-vocal",
+      "audioUrl": "/generated/ECHO_GXID_vocal.mp3",
+      "audio_url": "/generated/ECHO_GXID_vocal.mp3",
+      "duration": 60,
+      "mood": "Melancholy",
+      "genre": "Ambient",
+      "bpm": 90,
+      "key": "D",
+      "chords": [
+        "C",
+        "Am",
+        "F",
+        "G"
+      ],
+      "musicSheet": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with Synth, Violin, Flute",
+        "Main chord movement: C - Am - F - G",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ],
+      "lyrics": null,
+      "createdAt": "2026-06-19T10:48:32.059725+00:00",
+      "created_at": "2026-06-19T10:48:32.059725+00:00"
+    },
+    "UDFC": {
+      "songId": "UDFC",
+      "song_id": "UDFC",
+      "id": "UDFC",
+      "ownerEmail": "test@echo.com",
+      "title": "Song UDFC",
+      "provider": "Ace AI",
+      "mode": "ace-step",
+      "audioUrl": "/generated/ECHO_UDFC_ace.mp3",
+      "audio_url": "/generated/ECHO_UDFC_ace.mp3",
+      "duration": 30,
+      "mood": "energetic",
+      "genre": "rock",
+      "bpm": 90,
+      "key": "F",
+      "chords": [
+        "C",
+        "Am",
+        "F",
+        "G"
+      ],
+      "musicSheet": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with strings",
+        "Main chord movement: C - Am - F - G",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ],
+      "lyrics": {
+        "label": "Verse",
+        "text": "Rise up, let the darkness fade\nA new dawn breaks, a brand new shade\nWe'll chase the shadows, we'll take the stage\nOur hearts ablaze, our spirits engage"
+      },
+      "createdAt": "2026-06-19T10:50:02.414257+00:00",
+      "created_at": "2026-06-19T10:50:02.414257+00:00"
+    },
+    "TXRT": {
+      "songId": "TXRT",
+      "song_id": "TXRT",
+      "id": "TXRT",
+      "ownerEmail": "test@echo.com",
+      "title": "Song TXRT",
+      "provider": "MusicGen",
+      "mode": "musicgen",
+      "audioUrl": "/generated/TXRT.wav",
+      "audio_url": "/generated/TXRT.wav",
+      "duration": 30,
+      "mood": "dreamy",
+      "genre": "",
+      "bpm": 68,
+      "key": "C",
+      "chords": [
+        "Am",
+        "Fmaj7",
+        "C",
+        "G"
+      ],
+      "musicSheet": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with lead melody, chords, bass, and light rhythm",
+        "Main chord movement: Am - Fmaj7 - C - G",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ],
+      "lyrics": null,
+      "createdAt": "2026-06-19T11:00:52.884379+00:00",
+      "created_at": "2026-06-19T11:00:52.884379+00:00"
+    }
+  }
+}

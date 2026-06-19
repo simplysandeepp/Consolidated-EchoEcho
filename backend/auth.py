@@ -91,6 +91,15 @@ def user_email_for_token(token: str) -> str | None:
     return email.strip().lower() if email else None
 
 
+def user_name_for_email(email: str) -> str:
+    normalized = email.strip().lower()
+    if not normalized:
+        return ""
+    with _users_lock:
+        user = _read_users().get(normalized) or {}
+    return str(user.get("name") or normalized.split("@")[0].replace(".", " ").title())
+
+
 def login(email: str, password: str) -> dict[str, object]:
     normalized = email.strip().lower()
     with _users_lock:

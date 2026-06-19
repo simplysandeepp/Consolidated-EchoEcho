@@ -1150,34 +1150,17 @@ function normalizeTrack(t){
   }
 
   // load tracks (real library only — no demo data)
-  try {
-    tracks = (JSON.parse(localStorage.getItem('echo_tracks')) || []).map(normalizeTrack);
-  } catch(e) {
-    tracks = [];
-  }
-  if(!Array.isArray(tracks)) tracks = [];
+  tracks = [];
 
   renderView();
 
   // Sync backend history: server records are the source of truth for generated audio.
   const authToken = localStorage.getItem('echo_auth_token');
   const authFetchOptions = authToken ? {headers: {'Authorization': 'Bearer ' + authToken}} : {};
-  fetch('/history', authFetchOptions).then(r => r.ok ? r.json() : null).then(data => {
+  fetch('/api/library', authFetchOptions).then(r => r.ok ? r.json() : null).then(data => {
     const songs = Array.isArray(data) ? data : (data && Array.isArray(data.songs) ? data.songs : []);
-    if(!songs.length) return;
-    try {
-      const local = (JSON.parse(localStorage.getItem('echo_tracks') || '[]') || []).map(normalizeTrack);
-      const byId = new Map(local.map(t => [String(t.id), t]));
-      for(const song of songs) {
-        const serverTrack = normalizeTrack(song);
-        if(!serverTrack.id) continue;
-        const existing = byId.get(serverTrack.id) || {};
-        byId.set(serverTrack.id, normalizeTrack({...existing, ...serverTrack, fav: existing.fav || serverTrack.fav}));
-      }
-      tracks = Array.from(byId.values()).sort((a,b) => new Date(b.created_at || b.date) - new Date(a.created_at || a.date));
-      localStorage.setItem('echo_tracks', JSON.stringify(tracks));
-      renderView();
-    } catch(_){}
+    tracks = songs.map(normalizeTrack).sort((a,b) => new Date(b.created_at || b.date) - new Date(a.created_at || a.date));
+    renderView();
   }).catch(()=>{});
 
   // auto-open Create Inspo wizard (flag set by other pages)
@@ -1351,7 +1334,7 @@ function filterTracks(f, btn){
 ═══════════════════════════════════════════════ */
 function openTrack(id){
   closeAllMenus();
-  window.location.href = 'output.html?track=' + encodeURIComponent(id);
+  window.location.href = 'output.html?songId=' + encodeURIComponent(id);
 }
 
 // togglePlay is defined in the mini-player script below; this is the fallback
@@ -1454,7 +1437,6 @@ function deleteTrack(id){
 
 function saveTracks(){
   tracks = tracks.map(normalizeTrack);
-  localStorage.setItem('echo_tracks', JSON.stringify(tracks));
 }
 
 /* ═══════════════════════════════════════════════
@@ -1481,7 +1463,6 @@ async function handleLogout(){
   localStorage.removeItem('echo_user_email');
   localStorage.removeItem('echo_pending_inspo');
   localStorage.removeItem('echo_open_create');
-  localStorage.removeItem('echo_current_song');
   try{
     if(window.echoFirebaseSignOut) await window.echoFirebaseSignOut();
   }catch(err){
@@ -1858,16 +1839,8 @@ async function startVocalGeneration(){
 
     setGenUI('🎉 Song ready!', 100);
 
-    // Save track to localStorage library
     const libraryTrack = normalizeTrack({...data.track, genre: data.track.genre || payload.genre});
-    try {
-      const lib = (JSON.parse(localStorage.getItem('echo_tracks') || '[]') || []).map(normalizeTrack);
-      const idx = lib.findIndex(t => t.id === libraryTrack.id);
-      if(idx >= 0) lib.splice(idx, 1);
-      lib.unshift(libraryTrack);
-      localStorage.setItem('echo_tracks', JSON.stringify(lib));
-      tracks = lib;
-    } catch(_){}
+    tracks = [libraryTrack, ...tracks.filter(t => t.id !== libraryTrack.id)];
 
     await new Promise(r => setTimeout(r, 1200));
     closeVocalGen();

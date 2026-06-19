@@ -463,7 +463,8 @@ if (!SpeechRecognition) {
   recognition.onerror = function (event) {
     if (event.error === 'no-speech') return; // benign
     stopRecording();
-    showInputError('Voice error: ' + event.error + '. Please type your lyrics instead.');
+    const status = document.getElementById('rec-status');
+    if (status) status.textContent = 'Voice unavailable. Typing still works.';
   };
 }
 
@@ -644,8 +645,7 @@ function goToAceStep() {
     showRefineError('Please refine your lyrics first before creating a song.');
     return;
   }
-  localStorage.setItem('ace_step_prefill_lyrics', lyrics);
-  window.location.href = 'ace-step.html';
+  window.location.href = 'ace-step.html?lyrics=' + encodeURIComponent(lyrics);
 }
 </script>
 </body>

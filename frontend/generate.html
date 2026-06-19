@@ -739,7 +739,7 @@
           custom_prompt: inspo.promptText || '',
         }),
       });
-      return data.audio_url || null;
+      return data;
     } catch (e) {
       return null; // skipped, aborted or failed → live synth fallback
     } finally {
@@ -804,31 +804,23 @@
       completeStep('step-2', elapsed());
 
       activateStep('step-3');
-      const audioUrl = skipInstrumental ? null : await generateInstrumental();
+      const generated = skipInstrumental ? null : await generateInstrumental();
       completeStep('step-3', elapsed());
 
       activateStep('step-4');
-      const track = buildTrack(spec, audioUrl);
-      localStorage.setItem('echo_current_song', JSON.stringify(track));
-      // auto-save to the library so the dashboard always has it
-      let library = [];
-      try { library = JSON.parse(localStorage.getItem('echo_tracks')) || []; } catch (e) { /* fresh */ }
-      if (!Array.isArray(library)) library = [];
-      if (!library.some((item) => item.id === track.id)) {
-        library.unshift(track);
-        localStorage.setItem('echo_tracks', JSON.stringify(library));
-      }
+      const track = generated && (generated.song || generated.record) ? (generated.song || generated.record) : buildTrack(spec, null);
       await sleep(700);
       completeStep('step-4', elapsed());
 
       headlineLocked = true;
       setHeadline('Your track is ready!');
-      setSub(audioUrl
+      setSub(track.audio_url
         ? 'Studio instrumental rendered — taking you to your track…'
         : 'Composed with the live synth engine — taking you to your track…');
       setTimeout(() => {
         cleanupTimers();
-        window.location.href = 'output.html';
+        const id = track.song_id || track.code || track.id || '';
+        window.location.href = id ? 'output.html?songId=' + encodeURIComponent(id) : 'output.html';
       }, 1100);
     } catch (err) {
       console.error(err);

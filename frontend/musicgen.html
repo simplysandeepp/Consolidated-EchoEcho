@@ -739,8 +739,11 @@ function showResult(data) {
 /* ─── Save to library ──────────────────────────────────── */
 function saveToLibrary() {
   if (!lastAudioUrl) return;
-  const tracks = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
   const backendTrack = lastGeneratedTrack || {};
+  showToast(backendTrack.id || backendTrack.song_id || backendTrack.code ? 'Saved to your library!' : 'Generated track is available in this session');
+  document.getElementById('save-btn').textContent = 'Saved';
+  document.getElementById('save-btn').disabled = true;
+  return;
   const tempo = document.getElementById('bpm-slider').value;
   const titleParts = [joinSel('mood') || joinSel('genre') || 'Instrumental', joinSel('instrument')].filter(Boolean);
   const newTrack = {
@@ -762,7 +765,6 @@ function saveToLibrary() {
   const existing = tracks.findIndex(t => String(t.id) === String(newTrack.id));
   if (existing >= 0) tracks.splice(existing, 1);
   tracks.unshift(newTrack);
-  localStorage.setItem('echo_tracks', JSON.stringify(tracks));
   showToast('Saved to your library!');
   document.getElementById('save-btn').textContent = '✓ Saved';
   document.getElementById('save-btn').disabled = true;

@@ -663,11 +663,12 @@ let lastGeneratedTrack = null;
 
 /* ─── Pre-fill lyrics from Lyrics → Song page ─────────── */
 (function(){
-  const prefill = localStorage.getItem('ace_step_prefill_lyrics');
+  const params = new URLSearchParams(window.location.search);
+  const prefill = params.get('lyrics') || '';
   if(prefill){
     const ta = document.getElementById('lyrics-input');
     if(ta){ ta.value = prefill; }
-    localStorage.removeItem('ace_step_prefill_lyrics');
+    history.replaceState(null, '', 'ace-step.html');
   }
 })();
 
@@ -894,12 +895,15 @@ async function generate() {
     progressSection.style.display = 'none';
     const msg = err.message || '';
     const isTimeout = err.name === 'AbortError';
-    const isHfDown = /ACE-Step|gradio|HuggingFace|Space/i.test(msg);
+    const isMissingDependency = /dependency|gradio_client|not installed/i.test(msg);
+    const isHfDown = !isMissingDependency && /ACE-Step|HuggingFace|Space/i.test(msg);
     errorBox.textContent = isTimeout
       ? 'ACE-Step timed out — music generation can take up to 5 minutes. Please try again.'
       : isHfDown
         ? 'ACE-Step is currently unavailable — the HuggingFace Space may be sleeping. Please try again in a few minutes.'
-        : 'Error: ' + msg;
+        : isMissingDependency
+          ? msg
+          : 'Error: ' + msg;
     errorBox.style.display = 'block';
   } finally {
     btn.classList.remove('loading');
@@ -936,8 +940,9 @@ function showResult(data, prompt) {
 /* ─── Save to library ──────────────────────────────────── */
 function saveToLibrary() {
   if (!lastAudioUrl) return;
-  const tracks = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
   const backendTrack = lastGeneratedTrack || {};
+  alert(backendTrack.id || backendTrack.song_id || backendTrack.code ? 'Saved to your library!' : 'Generated track is available in this session.');
+  return;
   const newTrack = {
     id: String(backendTrack.id || backendTrack.song_id || backendTrack.code || Date.now()),
     title: (sel.mood[0] || sel.genre[0] || 'ACE-Step') + ' · Vocal Track',
@@ -953,7 +958,6 @@ function saveToLibrary() {
   const existing = tracks.findIndex(t => String(t.id) === String(newTrack.id));
   if (existing >= 0) tracks.splice(existing, 1);
   tracks.unshift(newTrack);
-  localStorage.setItem('echo_tracks', JSON.stringify(tracks));
   alert('Saved to your library!');
 }
 
