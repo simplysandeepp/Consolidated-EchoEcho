@@ -1127,6 +1127,8 @@ function normalizeTrack(t){
     genre: t.genre || t.style || '',
     bpm: t.bpm || t.BPM || t.beatsPerMinute || t.tempo || '',
     duration: Number.isFinite(duration) ? duration : 0,
+    favorite: Boolean(t.favorite ?? t.fav ?? false),
+    fav: Boolean(t.favorite ?? t.fav ?? false),
     audio_url: audioUrl,
     audioUrl: audioUrl,
     fileUrl: audioUrl,
@@ -1189,8 +1191,8 @@ function normalizeTrack(t){
   // Sync backend history: server records are the source of truth for generated audio.
   const authToken = localStorage.getItem('echo_auth_token');
   const authFetchOptions = authToken ? {headers: {'Authorization': 'Bearer ' + authToken}} : {};
-  fetch('/api/library', authFetchOptions).then(r => r.ok ? r.json() : null).then(data => {
-    const songs = Array.isArray(data) ? data : (data && Array.isArray(data.songs) ? data.songs : []);
+  fetch(API_BASE + '/api/tracks', authFetchOptions).then(r => r.ok ? r.json() : null).then(data => {
+    const songs = Array.isArray(data) ? data : [];
     tracks = songs.map(normalizeTrack).sort((a,b) => new Date(b.created_at || b.date) - new Date(a.created_at || a.date));
     renderView();
   }).catch(()=>{});
@@ -1435,14 +1437,40 @@ function downloadTrack(id, fmt='mp3'){
   showToast('Lyric sheet downloaded');
 }
 
-function toggleFav(id){
+async function toggleFav(id){
   closeAllMenus();
   const t = tracks.find(t=>t.id===id);
   if(!t) return;
-  t.fav = !t.fav;
+  const previous = Boolean(t.fav);
+  const next = !previous;
+  t.fav = next;
+  t.favorite = next;
   saveTracks();
   renderTracks();
-  showToast(t.fav ? '♥ Added to favourites' : 'Removed from favourites');
+  try{
+    const token = localStorage.getItem('echo_auth_token');
+    const res = await fetch(API_BASE + '/api/tracks/' + encodeURIComponent(id), {
+      method:'PATCH',
+      headers:{
+        'Content-Type':'application/json',
+        ...(token ? {'Authorization':'Bearer ' + token} : {})
+      },
+      body:JSON.stringify({favorite: next})
+    });
+    if(!res.ok) throw new Error('Favorite update failed');
+    const body = await res.json();
+    if(body && body.track){
+      Object.assign(t, normalizeTrack(body.track));
+      renderTracks();
+    }
+    showToast(next ? '♥ Added to favourites' : 'Removed from favourites');
+  }catch(_){
+    t.fav = previous;
+    t.favorite = previous;
+    saveTracks();
+    renderTracks();
+    showToast('Favourite could not be updated');
+  }
 }
 
 function shareTrack(id){
@@ -1459,11 +1487,24 @@ function deleteTrack(id){
   closeAllMenus();
   const card = document.getElementById('card-'+id);
   if(card){ card.style.opacity='.4'; card.style.transform='scale(.97)'; card.style.transition='all .2s'; }
-  setTimeout(()=>{
+  setTimeout(async ()=>{
+    const previous = tracks.slice();
     tracks = tracks.filter(t=>t.id!==id);
     saveTracks();
     renderView();
-    showToast('Track deleted');
+    try{
+      const token = localStorage.getItem('echo_auth_token');
+      const res = await fetch(API_BASE + '/api/tracks/' + encodeURIComponent(id), {
+        method:'DELETE',
+        headers:{...(token ? {'Authorization':'Bearer ' + token} : {})}
+      });
+      if(!res.ok) throw new Error('Delete failed');
+      showToast('Track deleted');
+    }catch(_){
+      tracks = previous;
+      renderView();
+      showToast('Track could not be deleted');
+    }
   },200);
 }
 

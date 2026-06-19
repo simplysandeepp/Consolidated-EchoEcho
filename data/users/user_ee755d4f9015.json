@@ -1,0 +1,113 @@
+[
+  {
+    "mode": "ace-step",
+    "code": "DOMN",
+    "song_id": "DOMN",
+    "created_at": "2026-06-19T18:54:06.082056+00:00",
+    "prompt": "romantic, sad r&b, pop, indie, 75bpm, inspiration",
+    "mood": "romantic, sad",
+    "theme": "inspiration",
+    "style": "r&b, pop, indie",
+    "instruments": [
+      "acoustic guitar",
+      "piano",
+      "flute"
+    ],
+    "tempo": 75,
+    "complexity": "Moderate",
+    "duration": 30,
+    "energy": 4,
+    "filename": "ECHO_DOMN_ace.mp3",
+    "audio_filename": "ECHO_DOMN_ace.mp3",
+    "original_audio_filename": "ECHO_DOMN_ace.mp3",
+    "output_file": "generated/ECHO_DOMN_ace.mp3",
+    "audio_url": "/generated/ECHO_DOMN_ace.mp3",
+    "lyrics": {
+      "label": "Verse",
+      "text": "Lost in the silence, I hear your name\nWhispers of memories, they still remain\nFading like shadows, the light is hard to claim\nMy heart beats for you, in this endless pain"
+    },
+    "copyright": {
+      "status": "safe",
+      "similarity_score": 0.91,
+      "notes": "Appears original.",
+      "matches": [],
+      "risk": "None",
+      "copyright_status": "Unknown",
+      "song_title": "",
+      "artist": "",
+      "details": "No strong evidence of existing lyrics."
+    },
+    "id": "DOMN",
+    "title": "Song DOMN",
+    "genre": "r&b, pop, indie",
+    "bpm": 75,
+    "durationSeconds": 30,
+    "duration_seconds": 30,
+    "audio_path": "generated/ECHO_DOMN_ace.mp3",
+    "audioUrl": "/generated/ECHO_DOMN_ace.mp3",
+    "sheet": {
+      "title": "Song DOMN",
+      "provider": "Ace AI",
+      "mood": "romantic, sad",
+      "genre": "r&b, pop, indie",
+      "bpm": 75,
+      "key": "Am",
+      "chords": [
+        "Dm",
+        "Bb",
+        "F",
+        "C"
+      ],
+      "musicSheet": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with acoustic guitar, piano, flute",
+        "Main chord movement: Dm - Bb - F - C",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ],
+      "lyrics": {
+        "label": "Verse",
+        "text": "Lost in the silence, I hear your name"
+      }
+    },
+    "sheetAvailable": true,
+    "lyricsAvailable": true,
+    "chords": [
+      "Dm",
+      "Bb",
+      "F",
+      "C"
+    ],
+    "key": "Am",
+    "timeSignature": "4/4",
+    "chordSheet": "CHORD SHEET\nKey: Am \u00b7 BPM: 75 \u00b7 Time Signature: 4/4\n\n[Intro]\n| Dm | Bb | F | C |\n\n[Verse]\n| Dm | Bb | F | C |\n| Bb | F | C | Dm |\n\n[Hook]\n| F | C | Dm | Bb |\n| C | Dm | Bb | F |\n\nPerformance Notes:\nKeep the feel romantic, sad and let the r&b, pop, indie groove breathe.",
+    "musicSheet": {
+      "title": "Song DOMN",
+      "key": "Am",
+      "bpm": 75,
+      "timeSignature": "4/4",
+      "scale": "Am major/minor modal color",
+      "mood": "romantic, sad",
+      "genre": "r&b, pop, indie",
+      "melodySketch": [
+        "Bar 1: A - C - G - C",
+        "Bar 2: B - C - E",
+        "Bar 3: G - E - C - B"
+      ],
+      "arrangement": [
+        "Piano/Synth: Main harmonic bed using Dm, Bb, F, C",
+        "Bass: Root-note movement that follows each bar",
+        "Drums: Light rhythmic support with space for the vocal or lead",
+        "Lead Texture: Reinforce the romantic, sad mood with acoustic guitar, piano, flute"
+      ],
+      "productionNotes": [
+        "Keep transitions clean and loop-friendly.",
+        "Use the hook section as the loudest point of the preview.",
+        "Avoid overfilling the midrange so the main melody stays readable."
+      ]
+    },
+    "favorite": false,
+    "fav": false,
+    "ownerEmail": "vibby005@gmail.com"
+  }
+]

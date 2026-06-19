@@ -21,6 +21,20 @@
       "songIds": [
         "ABCD"
       ]
+    },
+    "vibby005@gmail.com": {
+      "name": "vaibhav yadav",
+      "email": "vibby005@gmail.com",
+      "songIds": [
+        "DOMN"
+      ]
+    },
+    "lustsinpride@gmail.com": {
+      "name": "pride",
+      "email": "lustsinpride@gmail.com",
+      "songIds": [
+        "NXET"
+      ]
     }
   },
   "songs": {
@@ -394,7 +408,7 @@
         "mood": "dreamy",
         "genre": "pop",
         "bpm": 90,
-        "key": "G",
+        "key": "D",
         "chords": [
           "Am",
           "Fmaj7",
@@ -421,7 +435,7 @@
         "C",
         "G"
       ],
-      "key": "G",
+      "key": "D",
       "timeSignature": "4/4",
       "chordSheet": "",
       "musicSheet": null,
@@ -586,7 +600,7 @@
         "mood": "Selected mood",
         "genre": "Selected style",
         "bpm": 90,
-        "key": "Bb",
+        "key": "F",
         "chords": [
           "C",
           "Am",
@@ -609,21 +623,21 @@
         "F",
         "G"
       ],
-      "key": "Bb",
+      "key": "F",
       "timeSignature": "4/4",
-      "chordSheet": "CHORD SHEET\nKey: Bb \u00b7 BPM: 90 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel selected mood and let the Selected style groove breathe.",
+      "chordSheet": "CHORD SHEET\nKey: F \u00b7 BPM: 90 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel selected mood and let the Selected style groove breathe.",
       "musicSheet": {
         "title": "First User Song",
-        "key": "Bb",
+        "key": "F",
         "bpm": 90,
         "timeSignature": "4/4",
-        "scale": "Bb major/minor modal color",
+        "scale": "F major/minor modal color",
         "mood": "Selected mood",
         "genre": "Selected style",
         "melodySketch": [
-          "Bar 1: B - D# - G# - D#",
-          "Bar 2: C# - D# - F#",
-          "Bar 3: G# - F# - D# - C#"
+          "Bar 1: F - A - D - A",
+          "Bar 2: G - A - C",
+          "Bar 3: D - C - A - G"
         ],
         "arrangement": [
           "Piano/Synth: Main harmonic bed using C, Am, F, G",
@@ -641,29 +655,31 @@
       "genre": "",
       "bpm": 90,
       "duration": 0,
-      "audio_url": "",
+      "durationSeconds": 0,
+      "duration_seconds": 0,
+      "audio_url": "/generated/ABCD.wav",
       "lyrics": null,
+      "favorite": false,
+      "fav": false,
       "displayTitle": "First User Song",
       "songId": "ABCD",
       "filename": "ABCD.wav",
       "audio_filename": "ABCD.wav",
       "audio_path": "generated/ABCD.wav",
-      "audioUrl": "",
-      "fileUrl": null,
-      "generatedAudioUrl": null,
+      "audioUrl": "/generated/ABCD.wav",
+      "fileUrl": "/generated/ABCD.wav",
+      "generatedAudioUrl": "/generated/ABCD.wav",
       "musicgenUrl": null,
       "aceAudioUrl": null,
       "mp3Url": null,
-      "original_audio_url": null,
-      "original_download_url": null,
-      "download_url": null,
-      "downloadAudioUrl": null,
+      "original_audio_url": "/generated/ABCD.wav",
+      "original_download_url": "/download/ABCD/original",
+      "download_url": "/download/ABCD/original",
+      "downloadAudioUrl": "/download/ABCD/original",
       "trimmed_audio_url": null,
       "trimmed_download_url": null,
       "ownerEmail": "one@example.com",
       "provider": "MusicGen",
-      "durationSeconds": 0,
-      "duration_seconds": 0,
       "lengthSeconds": 0,
       "mood": "",
       "BPM": 90,
@@ -673,19 +689,19 @@
       "instrumental": null,
       "vocalsEnabled": null,
       "vocalMode": "",
-      "chord_sheet": "CHORD SHEET\nKey: Bb \u00b7 BPM: 90 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel selected mood and let the Selected style groove breathe.",
+      "chord_sheet": "CHORD SHEET\nKey: F \u00b7 BPM: 90 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel selected mood and let the Selected style groove breathe.",
       "music_sheet": {
         "title": "First User Song",
-        "key": "Bb",
+        "key": "F",
         "bpm": 90,
         "timeSignature": "4/4",
-        "scale": "Bb major/minor modal color",
+        "scale": "F major/minor modal color",
         "mood": "Selected mood",
         "genre": "Selected style",
         "melodySketch": [
-          "Bar 1: B - D# - G# - D#",
-          "Bar 2: C# - D# - F#",
-          "Bar 3: G# - F# - D# - C#"
+          "Bar 1: F - A - D - A",
+          "Bar 2: G - A - C",
+          "Bar 3: D - C - A - G"
         ],
         "arrangement": [
           "Piano/Synth: Main harmonic bed using C, Am, F, G",
@@ -701,16 +717,16 @@
       },
       "sheetMusic": {
         "title": "First User Song",
-        "key": "Bb",
+        "key": "F",
         "bpm": 90,
         "timeSignature": "4/4",
-        "scale": "Bb major/minor modal color",
+        "scale": "F major/minor modal color",
         "mood": "Selected mood",
         "genre": "Selected style",
         "melodySketch": [
-          "Bar 1: B - D# - G# - D#",
-          "Bar 2: C# - D# - F#",
-          "Bar 3: G# - F# - D# - C#"
+          "Bar 1: F - A - D - A",
+          "Bar 2: G - A - C",
+          "Bar 3: D - C - A - G"
         ],
         "arrangement": [
           "Piano/Synth: Main harmonic bed using C, Am, F, G",
@@ -781,7 +797,7 @@
         "mood": "Calm",
         "genre": "Piano",
         "bpm": 90,
-        "key": "F",
+        "key": "Bb",
         "chords": [
           "C",
           "Am",
@@ -804,21 +820,21 @@
         "F",
         "G"
       ],
-      "key": "F",
+      "key": "Bb",
       "timeSignature": "4/4",
-      "chordSheet": "CHORD SHEET\nKey: F \u00b7 BPM: 90 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel calm and let the Piano groove breathe.",
+      "chordSheet": "CHORD SHEET\nKey: Bb \u00b7 BPM: 90 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel calm and let the Piano groove breathe.",
       "musicSheet": {
         "title": "Inspiration WXYZ",
-        "key": "F",
+        "key": "Bb",
         "bpm": 90,
         "timeSignature": "4/4",
-        "scale": "F major/minor modal color",
+        "scale": "Bb major/minor modal color",
         "mood": "Calm",
         "genre": "Piano",
         "melodySketch": [
-          "Bar 1: F - A - D - A",
-          "Bar 2: G - A - C",
-          "Bar 3: D - C - A - G"
+          "Bar 1: B - D# - G# - D#",
+          "Bar 2: C# - D# - F#",
+          "Bar 3: G# - F# - D# - C#"
         ],
         "arrangement": [
           "Piano/Synth: Main harmonic bed using C, Am, F, G",
@@ -832,6 +848,9 @@
           "Avoid overfilling the midrange so the main melody stays readable."
         ]
       },
+      "favorite": false,
+      "fav": false,
+      "ownerEmail": "test@echo.com",
       "displayTitle": "Inspiration WXYZ",
       "songId": "WXYZ",
       "fileUrl": "/generated/ECHO_WXYZ_original.mp3",
@@ -840,12 +859,11 @@
       "aceAudioUrl": null,
       "mp3Url": "/generated/ECHO_WXYZ_original.mp3",
       "original_audio_url": "/generated/ECHO_WXYZ_original.mp3",
-      "original_download_url": "/api/song/WXYZ/audio",
-      "download_url": "/api/song/WXYZ/audio",
-      "downloadAudioUrl": "/api/song/WXYZ/audio",
+      "original_download_url": "/download/WXYZ/original",
+      "download_url": "/download/WXYZ/original",
+      "downloadAudioUrl": "/download/WXYZ/original",
       "trimmed_audio_url": null,
       "trimmed_download_url": null,
-      "ownerEmail": "test@echo.com",
       "provider": "KIE.AI",
       "lengthSeconds": 30,
       "BPM": 90,
@@ -854,19 +872,19 @@
       "instrumental": null,
       "vocalsEnabled": null,
       "vocalMode": "",
-      "chord_sheet": "CHORD SHEET\nKey: F \u00b7 BPM: 90 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel calm and let the Piano groove breathe.",
+      "chord_sheet": "CHORD SHEET\nKey: Bb \u00b7 BPM: 90 \u00b7 Time Signature: 4/4\n\n[Intro]\n| C | Am | F | G |\n\n[Verse]\n| C | Am | F | G |\n| Am | F | G | C |\n\n[Hook]\n| F | G | C | Am |\n| G | C | Am | F |\n\nPerformance Notes:\nKeep the feel calm and let the Piano groove breathe.",
       "music_sheet": {
         "title": "Inspiration WXYZ",
-        "key": "F",
+        "key": "Bb",
         "bpm": 90,
         "timeSignature": "4/4",
-        "scale": "F major/minor modal color",
+        "scale": "Bb major/minor modal color",
         "mood": "Calm",
         "genre": "Piano",
         "melodySketch": [
-          "Bar 1: F - A - D - A",
-          "Bar 2: G - A - C",
-          "Bar 3: D - C - A - G"
+          "Bar 1: B - D# - G# - D#",
+          "Bar 2: C# - D# - F#",
+          "Bar 3: G# - F# - D# - C#"
         ],
         "arrangement": [
           "Piano/Synth: Main harmonic bed using C, Am, F, G",
@@ -882,16 +900,16 @@
       },
       "sheetMusic": {
         "title": "Inspiration WXYZ",
-        "key": "F",
+        "key": "Bb",
         "bpm": 90,
         "timeSignature": "4/4",
-        "scale": "F major/minor modal color",
+        "scale": "Bb major/minor modal color",
         "mood": "Calm",
         "genre": "Piano",
         "melodySketch": [
-          "Bar 1: F - A - D - A",
-          "Bar 2: G - A - C",
-          "Bar 3: D - C - A - G"
+          "Bar 1: B - D# - G# - D#",
+          "Bar 2: C# - D# - F#",
+          "Bar 3: G# - F# - D# - C#"
         ],
         "arrangement": [
           "Piano/Synth: Main harmonic bed using C, Am, F, G",
@@ -1540,6 +1558,385 @@
       ],
       "lyricsSheetDownloadUrl": "/api/song/AXGV/lyrics-sheet",
       "createdAt": "2026-06-19T16:38:03.600245+00:00"
+    },
+    "DOMN": {
+      "mode": "ace-step",
+      "code": "DOMN",
+      "song_id": "DOMN",
+      "created_at": "2026-06-19T18:54:06.082056+00:00",
+      "prompt": "romantic, sad r&b, pop, indie, 75bpm, inspiration",
+      "mood": "romantic, sad",
+      "theme": "inspiration",
+      "style": "r&b, pop, indie",
+      "instruments": [
+        "acoustic guitar",
+        "piano",
+        "flute"
+      ],
+      "tempo": 75,
+      "complexity": "Moderate",
+      "duration": 30,
+      "energy": 4,
+      "filename": "ECHO_DOMN_ace.mp3",
+      "audio_filename": "ECHO_DOMN_ace.mp3",
+      "original_audio_filename": "ECHO_DOMN_ace.mp3",
+      "output_file": "generated/ECHO_DOMN_ace.mp3",
+      "audio_url": "/generated/ECHO_DOMN_ace.mp3",
+      "lyrics": {
+        "label": "Verse",
+        "text": "Lost in the silence, I hear your name"
+      },
+      "copyright": {
+        "status": "safe",
+        "similarity_score": 0.91,
+        "notes": "Appears original.",
+        "matches": [],
+        "risk": "None",
+        "copyright_status": "Unknown",
+        "song_title": "",
+        "artist": "",
+        "details": "No strong evidence of existing lyrics."
+      },
+      "id": "DOMN",
+      "title": "Song DOMN",
+      "genre": "r&b, pop, indie",
+      "bpm": 75,
+      "durationSeconds": 30,
+      "duration_seconds": 30,
+      "audio_path": "generated/ECHO_DOMN_ace.mp3",
+      "audioUrl": "/generated/ECHO_DOMN_ace.mp3",
+      "sheet": {
+        "title": "Song DOMN",
+        "provider": "Ace AI",
+        "mood": "romantic, sad",
+        "genre": "r&b, pop, indie",
+        "bpm": 75,
+        "key": "Am",
+        "chords": [
+          "Dm",
+          "Bb",
+          "F",
+          "C"
+        ],
+        "musicSheet": [
+          "0:00-0:10 soft intro that states the mood clearly",
+          "0:10-0:35 main melodic idea over the core progression",
+          "0:35-0:55 fuller arrangement with acoustic guitar, piano, flute",
+          "Main chord movement: Dm - Bb - F - C",
+          "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+        ],
+        "lyrics": {
+          "label": "Verse",
+          "text": "Lost in the silence, I hear your name"
+        }
+      },
+      "sheetAvailable": true,
+      "lyricsAvailable": true,
+      "chords": [
+        "Dm",
+        "Bb",
+        "F",
+        "C"
+      ],
+      "key": "Am",
+      "timeSignature": "4/4",
+      "chordSheet": "CHORD SHEET\nKey: Am \u00b7 BPM: 75 \u00b7 Time Signature: 4/4\n\n[Intro]\n| Dm | Bb | F | C |\n\n[Verse]\n| Dm | Bb | F | C |\n| Bb | F | C | Dm |\n\n[Hook]\n| F | C | Dm | Bb |\n| C | Dm | Bb | F |\n\nPerformance Notes:\nKeep the feel romantic, sad and let the r&b, pop, indie groove breathe.",
+      "musicSheet": {
+        "title": "Song DOMN",
+        "key": "Am",
+        "bpm": 75,
+        "timeSignature": "4/4",
+        "scale": "Am major/minor modal color",
+        "mood": "romantic, sad",
+        "genre": "r&b, pop, indie",
+        "melodySketch": [
+          "Bar 1: A - C - G - C",
+          "Bar 2: B - C - E",
+          "Bar 3: G - E - C - B"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using Dm, Bb, F, C",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the romantic, sad mood with acoustic guitar, piano, flute"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "favorite": false,
+      "fav": false,
+      "ownerEmail": "vibby005@gmail.com",
+      "displayTitle": "Song DOMN",
+      "songId": "DOMN",
+      "fileUrl": "/generated/ECHO_DOMN_ace.mp3",
+      "generatedAudioUrl": "/generated/ECHO_DOMN_ace.mp3",
+      "musicgenUrl": null,
+      "aceAudioUrl": "/generated/ECHO_DOMN_ace.mp3",
+      "mp3Url": "/generated/ECHO_DOMN_ace.mp3",
+      "original_audio_url": "/generated/ECHO_DOMN_ace.mp3",
+      "original_download_url": "/download/DOMN/original",
+      "download_url": "/download/DOMN/original",
+      "downloadAudioUrl": "/download/DOMN/original",
+      "trimmed_audio_url": null,
+      "trimmed_download_url": null,
+      "provider": "Ace AI",
+      "lengthSeconds": 30,
+      "BPM": 75,
+      "beatsPerMinute": 75,
+      "isInstrumental": null,
+      "instrumental": null,
+      "vocalsEnabled": null,
+      "vocalMode": "",
+      "chord_sheet": "CHORD SHEET\nKey: Am \u00b7 BPM: 75 \u00b7 Time Signature: 4/4\n\n[Intro]\n| Dm | Bb | F | C |\n\n[Verse]\n| Dm | Bb | F | C |\n| Bb | F | C | Dm |\n\n[Hook]\n| F | C | Dm | Bb |\n| C | Dm | Bb | F |\n\nPerformance Notes:\nKeep the feel romantic, sad and let the r&b, pop, indie groove breathe.",
+      "music_sheet": {
+        "title": "Song DOMN",
+        "key": "Am",
+        "bpm": 75,
+        "timeSignature": "4/4",
+        "scale": "Am major/minor modal color",
+        "mood": "romantic, sad",
+        "genre": "r&b, pop, indie",
+        "melodySketch": [
+          "Bar 1: A - C - G - C",
+          "Bar 2: B - C - E",
+          "Bar 3: G - E - C - B"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using Dm, Bb, F, C",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the romantic, sad mood with acoustic guitar, piano, flute"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "sheetMusic": {
+        "title": "Song DOMN",
+        "key": "Am",
+        "bpm": 75,
+        "timeSignature": "4/4",
+        "scale": "Am major/minor modal color",
+        "mood": "romantic, sad",
+        "genre": "r&b, pop, indie",
+        "melodySketch": [
+          "Bar 1: A - C - G - C",
+          "Bar 2: B - C - E",
+          "Bar 3: G - E - C - B"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using Dm, Bb, F, C",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the romantic, sad mood with acoustic guitar, piano, flute"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "sheetMusicPdfUrl": "",
+      "musicSheetPdfUrl": "",
+      "sheet_music_pdf_url": "",
+      "musicSheetLines": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with acoustic guitar, piano, flute",
+        "Main chord movement: Dm - Bb - F - C",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ],
+      "lyricsSheetDownloadUrl": "/api/song/DOMN/lyrics-sheet",
+      "createdAt": "2026-06-19T18:54:06.082056+00:00"
+    },
+    "NXET": {
+      "code": "NXET",
+      "song_id": "NXET",
+      "task_id": "073e8c79ed70983f144ca92f2c0a9bc1",
+      "created_at": "2026-06-19T18:59:01.224611+00:00",
+      "mood": "Rebellious, Dark",
+      "theme": "Mountain, Peace",
+      "style": "Electric",
+      "instruments": [
+        "Guitar, Synth"
+      ],
+      "tempo": 70,
+      "energy": 7,
+      "original_audio_filename": "ECHO_NXET_vocal.mp3",
+      "audio_source_url": "https://tempfile.aiquickdraw.com/r/d53a8c2f955440548013396dab740e72.mp3",
+      "trimmed_audio_filename": null,
+      "mode": "kie-vocal",
+      "filename": "ECHO_NXET_vocal.mp3",
+      "audio_filename": "ECHO_NXET_vocal.mp3",
+      "genre": "Lo-fi, R&B",
+      "mood_tag": "Rebellious, Dark",
+      "bpm": 70,
+      "id": "NXET",
+      "title": "Song NXET",
+      "duration": 60,
+      "durationSeconds": 60,
+      "duration_seconds": 60,
+      "audio_path": "generated/ECHO_NXET_vocal.mp3",
+      "audio_url": "/generated/ECHO_NXET_vocal.mp3",
+      "audioUrl": "/generated/ECHO_NXET_vocal.mp3",
+      "output_file": "generated/ECHO_NXET_vocal.mp3",
+      "lyrics": {
+        "label": "Verse",
+        "text": "I Climbed with a split-lip grin Mud on my boots again The ridge kept asking my name I said I came to break your chain Stone face cold wind stare Hands up I don't care Your old fear can't stay here I left it low, I left it rear Hear that hush on the edge of the pine It hits like thunder then it shines I burn, I bend, I don't confess I found my calm in the wreck Black Mountain, take me in Black Mountain, peace within I rebel, I rise, I breathe again Black Mountain, peace within Peace within Peace within No gold crown, no holy hall Just a crack in the shale wall I traced my pulse in the stone And heard my wild heart home The sky wore bruises of blue The river could glean through I laughed at the weight I wore Then laid it down on the floor Hear that hush on the edge of the pine It hits like thunder, then it shines I burn, I bend, I don't confess I found my calm in the wreck Black Mountain, take me in Black Mountain, peace within I'll blow, I'll rise, I'll breathe again Black Mountain, peace within Peace within Peace within Let the old storm call my name I won't kneel to the same old flame I learned the hard way, iron and stone Peace is a place I make my own Black Mountain, take me in Black Mountain, peace within I build, I rise, I breathe again Black Mountain, peace within Peace within Peace within I'm out."
+      },
+      "lyricsAvailable": true,
+      "sheet": {
+        "title": "Song NXET",
+        "provider": "KIE.AI",
+        "mood": "Rebellious, Dark",
+        "genre": "Lo-fi, R&B",
+        "bpm": 70,
+        "key": "Fm",
+        "chords": [
+          "Em",
+          "C",
+          "G",
+          "D"
+        ],
+        "musicSheet": [
+          "0:00-0:10 soft intro that states the mood clearly",
+          "0:10-0:35 main melodic idea over the core progression",
+          "0:35-0:55 fuller arrangement with Guitar, Synth",
+          "Main chord movement: Em - C - G - D",
+          "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+        ],
+        "lyrics": {
+          "label": "Verse",
+          "text": "I Climbed with a split-lip grin Mud on my boots again The ridge kept asking my name I said I came to break your chain Stone face cold wind stare Hands up I don't care Your old fear can't stay here I left it low, I left it rear Hear that hush on the edge of the pine It hits like thunder then it shines I burn, I bend, I don't confess I found my calm in the wreck Black Mountain, take me in Black Mountain, peace within I rebel, I rise, I breathe again Black Mountain, peace within Peace within Peace within No gold crown, no holy hall Just a crack in the shale wall I traced my pulse in the stone And heard my wild heart home The sky wore bruises of blue The river could glean through I laughed at the weight I wore Then laid it down on the floor Hear that hush on the edge of the pine It hits like thunder, then it shines I burn, I bend, I don't confess I found my calm in the wreck Black Mountain, take me in Black Mountain, peace within I'll blow, I'll rise, I'll breathe again Black Mountain, peace within Peace within Peace within Let the old storm call my name I won't kneel to the same old flame I learned the hard way, iron and stone Peace is a place I make my own Black Mountain, take me in Black Mountain, peace within I build, I rise, I breathe again Black Mountain, peace within Peace within Peace within I'm out."
+        }
+      },
+      "sheetAvailable": true,
+      "chords": [
+        "Em",
+        "C",
+        "G",
+        "D"
+      ],
+      "key": "Fm",
+      "timeSignature": "4/4",
+      "chordSheet": "CHORD SHEET\nKey: Fm \u00b7 BPM: 70 \u00b7 Time Signature: 4/4\n\n[Intro]\n| Em | C | G | D |\n\n[Verse]\n| Em | C | G | D |\n| C | G | D | Em |\n\n[Hook]\n| G | D | Em | C |\n| D | Em | C | G |\n\nPerformance Notes:\nKeep the feel rebellious, dark and let the Lo-fi, R&B groove breathe.",
+      "musicSheet": {
+        "title": "Song NXET",
+        "key": "Fm",
+        "bpm": 70,
+        "timeSignature": "4/4",
+        "scale": "Fm major/minor modal color",
+        "mood": "Rebellious, Dark",
+        "genre": "Lo-fi, R&B",
+        "melodySketch": [
+          "Bar 1: F - A - D - A",
+          "Bar 2: G - A - C",
+          "Bar 3: D - C - A - G"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using Em, C, G, D",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the rebellious, dark mood with Guitar, Synth"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "favorite": false,
+      "fav": false,
+      "ownerEmail": "lustsinpride@gmail.com",
+      "displayTitle": "Song NXET",
+      "songId": "NXET",
+      "fileUrl": "/generated/ECHO_NXET_vocal.mp3",
+      "generatedAudioUrl": "/generated/ECHO_NXET_vocal.mp3",
+      "musicgenUrl": null,
+      "aceAudioUrl": null,
+      "mp3Url": "/generated/ECHO_NXET_vocal.mp3",
+      "original_audio_url": "/generated/ECHO_NXET_vocal.mp3",
+      "original_download_url": "/download/NXET/original",
+      "download_url": "/download/NXET/original",
+      "downloadAudioUrl": "/download/NXET/original",
+      "trimmed_audio_url": null,
+      "trimmed_download_url": null,
+      "provider": "KIE.AI",
+      "lengthSeconds": 60,
+      "BPM": 70,
+      "beatsPerMinute": 70,
+      "isInstrumental": null,
+      "instrumental": null,
+      "vocalsEnabled": null,
+      "vocalMode": "",
+      "chord_sheet": "CHORD SHEET\nKey: Fm \u00b7 BPM: 70 \u00b7 Time Signature: 4/4\n\n[Intro]\n| Em | C | G | D |\n\n[Verse]\n| Em | C | G | D |\n| C | G | D | Em |\n\n[Hook]\n| G | D | Em | C |\n| D | Em | C | G |\n\nPerformance Notes:\nKeep the feel rebellious, dark and let the Lo-fi, R&B groove breathe.",
+      "music_sheet": {
+        "title": "Song NXET",
+        "key": "Fm",
+        "bpm": 70,
+        "timeSignature": "4/4",
+        "scale": "Fm major/minor modal color",
+        "mood": "Rebellious, Dark",
+        "genre": "Lo-fi, R&B",
+        "melodySketch": [
+          "Bar 1: F - A - D - A",
+          "Bar 2: G - A - C",
+          "Bar 3: D - C - A - G"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using Em, C, G, D",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the rebellious, dark mood with Guitar, Synth"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "sheetMusic": {
+        "title": "Song NXET",
+        "key": "Fm",
+        "bpm": 70,
+        "timeSignature": "4/4",
+        "scale": "Fm major/minor modal color",
+        "mood": "Rebellious, Dark",
+        "genre": "Lo-fi, R&B",
+        "melodySketch": [
+          "Bar 1: F - A - D - A",
+          "Bar 2: G - A - C",
+          "Bar 3: D - C - A - G"
+        ],
+        "arrangement": [
+          "Piano/Synth: Main harmonic bed using Em, C, G, D",
+          "Bass: Root-note movement that follows each bar",
+          "Drums: Light rhythmic support with space for the vocal or lead",
+          "Lead Texture: Reinforce the rebellious, dark mood with Guitar, Synth"
+        ],
+        "productionNotes": [
+          "Keep transitions clean and loop-friendly.",
+          "Use the hook section as the loudest point of the preview.",
+          "Avoid overfilling the midrange so the main melody stays readable."
+        ]
+      },
+      "sheetMusicPdfUrl": "",
+      "musicSheetPdfUrl": "",
+      "sheet_music_pdf_url": "",
+      "musicSheetLines": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with Guitar, Synth",
+        "Main chord movement: Em - C - G - D",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ],
+      "lyricsSheetDownloadUrl": "/api/song/NXET/lyrics-sheet",
+      "createdAt": "2026-06-19T18:59:01.224611+00:00"
     }
   }
 }

@@ -41,7 +41,7 @@ from .music_generator import (
     generate_music,
     load_model,
 )
-from .auth import AuthError, login as auth_login, signup as auth_signup, user_email_for_token, user_name_for_email
+from .auth import AuthError, login as auth_login, signup as auth_signup, user_email_for_token, user_name_for_email, user_name_for_token
 from .composer import compose_song
 from .transcriber import TranscriptionError, transcribe_audio
 from .agents.lyrics_agent import generate_lyrics as generate_agent_lyrics
@@ -171,6 +171,10 @@ class TrimRequest(BaseModel):
     force: bool = False
 
 
+class TrackUpdateRequest(BaseModel):
+    favorite: bool | None = None
+
+
 class CopyrightCheckApiRequest(BaseModel):
     song_id: str | None = None
     lyrics: str = ""
@@ -278,7 +282,14 @@ def load_user_songs(user_id: str) -> list[dict[str, Any]]:
     path = user_songs_path(user_id)
     if not path.exists():
         write_json_list(path, [])
-    return read_json_list(path)
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8") or "[]")
+    except (FileNotFoundError, json.JSONDecodeError):
+        raw = []
+    if isinstance(raw, dict):
+        tracks = raw.get("tracks")
+        return tracks if isinstance(tracks, list) else []
+    return raw if isinstance(raw, list) else []
 
 
 def write_user_songs(user_id: str, songs: list[dict[str, Any]]) -> None:
@@ -389,8 +400,14 @@ def save_user_song(
     song_data.setdefault("genre", song_data.get("style") or "")
     song_data.setdefault("bpm", song_data.get("tempo") or 90)
     song_data.setdefault("duration", 0)
+    song_data.setdefault("durationSeconds", song_data.get("duration"))
+    song_data.setdefault("duration_seconds", song_data.get("duration"))
     song_data.setdefault("audio_url", "")
     song_data.setdefault("lyrics", "")
+    song_data.setdefault("favorite", bool(song_data.get("favorite") or song_data.get("fav") or False))
+    song_data["fav"] = bool(song_data.get("favorite"))
+    if user_email:
+        song_data["ownerEmail"] = user_email.strip().lower()
     songs.append(song_data)
     write_user_songs(user_id, songs)
     remember_user_song(user_email, user_name, song_data)
@@ -418,7 +435,8 @@ def current_user_email(request: Request | None) -> str:
 
 
 def current_user_name(request: Request | None) -> str:
-    return user_name_for_email(current_user_email(request))
+    token_name = user_name_for_token(auth_token_from_request(request))
+    return token_name or user_name_for_email(current_user_email(request))
 
 
 def iter_user_song_files() -> list[Path]:
@@ -1004,6 +1022,11 @@ def migrate_history_to_state(request: Request) -> dict[str, Any]:
 
 def state_song_for_user(song_id: str, request: Request) -> dict[str, Any] | None:
     normalized = song_id.strip().upper()
+    email = current_user_email(request).strip().lower()
+    _, history_record = find_history_record(normalized, current_user_id(request))
+    if history_record:
+        return song_detail_payload(history_record, owner_email=email)
+
     email, _, state, user = state_user_entry(request)
     if normalized not in set(str(item).upper() for item in user.get("songIds") or []):
         return None
@@ -1018,6 +1041,21 @@ def state_song_for_user(song_id: str, request: Request) -> dict[str, Any] | None
 
 def update_state_song_for_user(song_id: str, request: Request, updates: dict[str, Any]) -> dict[str, Any] | None:
     normalized = song_id.strip().upper()
+    email = current_user_email(request).strip().lower()
+    user_id = current_user_id(request)
+    history = read_history(user_id)
+    changed = False
+    updated_record: dict[str, Any] | None = None
+    for record in history:
+        if record_code(record) == normalized:
+            record.update(updates)
+            changed = True
+            updated_record = record
+    if changed:
+        write_user_songs(user_id, history)
+        remember_user_song(email, current_user_name(request), updated_record or {})
+        return song_detail_payload(updated_record or {}, owner_email=email)
+
     email, _, state, user = state_user_entry(request)
     if normalized not in set(str(item).upper() for item in user.get("songIds") or []):
         return None
@@ -1030,16 +1068,6 @@ def update_state_song_for_user(song_id: str, request: Request, updates: dict[str
     song.update(updates)
     state["songs"][normalized] = song
     write_user_state(state)
-
-    user_id = current_user_id(request)
-    history = read_history(user_id)
-    changed = False
-    for record in history:
-        if record_code(record) == normalized:
-            record.update(updates)
-            changed = True
-    if changed:
-        write_user_songs(user_id, history)
     return song_detail_payload(song, owner_email=email)
 
 
@@ -1069,11 +1097,11 @@ def with_urls(record: dict[str, Any]) -> dict[str, Any]:
         or None
     )
 
-    local_original_exists = original and generated_audio_path(original).exists()
-    original_url = generated_url(original) if local_original_exists else saved_audio_url or source_url
+    local_original_exists = bool(original and generated_audio_path(original).exists())
+    original_url = generated_url(original) if original else saved_audio_url or source_url
 
-    local_trimmed_exists = trimmed and generated_audio_path(trimmed).exists()
-    trimmed_url = generated_url(trimmed) if local_trimmed_exists else None
+    local_trimmed_exists = bool(trimmed and generated_audio_path(trimmed).exists())
+    trimmed_url = generated_url(trimmed) if trimmed else None
     playable_url = trimmed_url or original_url
 
     return {
@@ -1097,9 +1125,9 @@ def with_urls(record: dict[str, Any]) -> dict[str, Any]:
         "aceAudioUrl": playable_url if str(record.get("mode") or "").lower() in {"ace-step", "ace_step", "ace"} else record.get("aceAudioUrl"),
         "mp3Url": playable_url if playable_url and str(playable_url).lower().endswith(".mp3") else record.get("mp3Url"),
         "original_audio_url": original_url,
-        "original_download_url": f"/api/song/{code}/audio" if code and local_original_exists else None,
-        "download_url": f"/api/song/{code}/audio" if code and local_original_exists else None,
-        "downloadAudioUrl": f"/api/song/{code}/audio" if code and local_original_exists else None,
+        "original_download_url": f"/download/{code}/original" if code and original else None,
+        "download_url": f"/download/{code}/original" if code and original else None,
+        "downloadAudioUrl": f"/download/{code}/original" if code and original else None,
         "trimmed_audio_url": trimmed_url,
         "trimmed_download_url": f"/download/{code}/trimmed" if trimmed else None,
         "sheetAvailable": bool(record.get("sheetAvailable")),
@@ -1823,21 +1851,25 @@ def get_generation_status() -> dict[str, Any]:
 
 @app.get("/history")
 def history(request: Request) -> dict[str, Any]:
-    records = [with_urls(item) for item in read_history(current_user_id(request))]
+    email = current_user_email(request).strip().lower()
+    records = [with_urls({**item, "ownerEmail": email}) for item in read_history(current_user_id(request))]
     return {"songs": list(reversed(records))}
+
+
+@app.get("/api/tracks")
+def api_tracks(request: Request) -> list[dict[str, Any]]:
+    email = current_user_email(request).strip().lower()
+    name = current_user_name(request)
+    records = read_history(current_user_id(request))
+    remember_user_profile(email, name, [record_code(record) for record in records if record_code(record)])
+    return [song_detail_payload(with_urls({**record, "ownerEmail": email}), owner_email=email) for record in reversed(records)]
 
 
 @app.get("/api/library")
 def api_library(request: Request) -> dict[str, Any]:
-    state = migrate_history_to_state(request)
+    songs = api_tracks(request)
     email, _, _, user = state_user_entry(request)
-    song_ids = [str(song_id).upper() for song_id in user.get("songIds") or [] if str(song_id).strip()]
-    songs = [
-        song_detail_payload(state["songs"][song_id], owner_email=email)
-        for song_id in reversed(song_ids)
-        if isinstance(state["songs"].get(song_id), dict)
-        and str(state["songs"][song_id].get("ownerEmail") or email).strip().lower() == email
-    ]
+    song_ids = [record_code(song) for song in songs if record_code(song)]
     return {
         "ok": True,
         "user": {
@@ -1921,6 +1953,45 @@ def api_track(song_id: str, request: Request) -> dict[str, Any]:
     if record:
         return {"ok": True, "track": record, "song": record}
     raise HTTPException(status_code=404, detail="Track not found")
+
+
+@app.patch("/tracks/{song_id}")
+@app.patch("/api/tracks/{song_id}")
+def api_update_track(song_id: str, payload: TrackUpdateRequest, request: Request) -> dict[str, Any]:
+    updates: dict[str, Any] = {}
+    if payload.favorite is not None:
+        updates["favorite"] = payload.favorite
+        updates["fav"] = payload.favorite
+    if not updates:
+        record = state_song_for_user(song_id, request)
+        if record:
+            return {"ok": True, "track": record, "song": record}
+        raise HTTPException(status_code=404, detail="Track not found")
+
+    updated = update_state_song_for_user(song_id, request, updates)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Track not found")
+    return {"ok": True, "track": updated, "song": updated}
+
+
+@app.delete("/tracks/{song_id}")
+@app.delete("/api/tracks/{song_id}")
+def api_delete_track(song_id: str, request: Request) -> dict[str, Any]:
+    normalized = song_id.strip().upper()
+    user_id = current_user_id(request)
+    history = read_history(user_id)
+    kept = [record for record in history if record_code(record) != normalized]
+    if len(kept) == len(history):
+        raise HTTPException(status_code=404, detail="Track not found")
+    write_user_songs(user_id, kept)
+
+    email, _, state, user = state_user_entry(request)
+    user["songIds"] = [item for item in user.get("songIds") or [] if str(item).upper() != normalized]
+    song = state["songs"].get(normalized)
+    if isinstance(song, dict) and str(song.get("ownerEmail") or email).strip().lower() == email:
+        state["songs"].pop(normalized, None)
+    write_user_state(state)
+    return {"ok": True}
 
 
 @app.post("/api/song/{song_id}/generate-chords")

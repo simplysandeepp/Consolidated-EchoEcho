@@ -1,0 +1,102 @@
+[
+  {
+    "code": "NXET",
+    "song_id": "NXET",
+    "task_id": "073e8c79ed70983f144ca92f2c0a9bc1",
+    "created_at": "2026-06-19T18:59:01.224611+00:00",
+    "mood": "Rebellious, Dark",
+    "theme": "Mountain, Peace",
+    "style": "Electric",
+    "instruments": [
+      "Guitar, Synth"
+    ],
+    "tempo": 70,
+    "energy": 7,
+    "original_audio_filename": "ECHO_NXET_vocal.mp3",
+    "audio_source_url": "https://tempfile.aiquickdraw.com/r/d53a8c2f955440548013396dab740e72.mp3",
+    "trimmed_audio_filename": null,
+    "mode": "kie-vocal",
+    "filename": "ECHO_NXET_vocal.mp3",
+    "audio_filename": "ECHO_NXET_vocal.mp3",
+    "genre": "Lo-fi, R&B",
+    "mood_tag": "Rebellious, Dark",
+    "bpm": 70,
+    "id": "NXET",
+    "title": "Song NXET",
+    "duration": 60,
+    "durationSeconds": 60,
+    "duration_seconds": 60,
+    "audio_path": "generated/ECHO_NXET_vocal.mp3",
+    "audio_url": "/generated/ECHO_NXET_vocal.mp3",
+    "audioUrl": "/generated/ECHO_NXET_vocal.mp3",
+    "output_file": "generated/ECHO_NXET_vocal.mp3",
+    "lyrics": {
+      "label": "Verse",
+      "text": "I Climbed with a split-lip grin Mud on my boots again The ridge kept asking my name I said I came to break your chain Stone face cold wind stare Hands up I don't care Your old fear can't stay here I left it low, I left it rear Hear that hush on the edge of the pine It hits like thunder then it shines I burn, I bend, I don't confess I found my calm in the wreck Black Mountain, take me in Black Mountain, peace within I rebel, I rise, I breathe again Black Mountain, peace within Peace within Peace within No gold crown, no holy hall Just a crack in the shale wall I traced my pulse in the stone And heard my wild heart home The sky wore bruises of blue The river could glean through I laughed at the weight I wore Then laid it down on the floor Hear that hush on the edge of the pine It hits like thunder, then it shines I burn, I bend, I don't confess I found my calm in the wreck Black Mountain, take me in Black Mountain, peace within I'll blow, I'll rise, I'll breathe again Black Mountain, peace within Peace within Peace within Let the old storm call my name I won't kneel to the same old flame I learned the hard way, iron and stone Peace is a place I make my own Black Mountain, take me in Black Mountain, peace within I build, I rise, I breathe again Black Mountain, peace within Peace within Peace within I'm out."
+    },
+    "lyricsAvailable": true,
+    "sheet": {
+      "title": "Song NXET",
+      "provider": "KIE.AI",
+      "mood": "Rebellious, Dark",
+      "genre": "Lo-fi, R&B",
+      "bpm": 70,
+      "key": "Fm",
+      "chords": [
+        "Em",
+        "C",
+        "G",
+        "D"
+      ],
+      "musicSheet": [
+        "0:00-0:10 soft intro that states the mood clearly",
+        "0:10-0:35 main melodic idea over the core progression",
+        "0:35-0:55 fuller arrangement with Guitar, Synth",
+        "Main chord movement: Em - C - G - D",
+        "Keep the progression simple and loop-friendly for a 45-60 second inspiration clip"
+      ],
+      "lyrics": {
+        "label": "Verse",
+        "text": "I Climbed with a split-lip grin Mud on my boots again The ridge kept asking my name I said I came to break your chain Stone face cold wind stare Hands up I don't care Your old fear can't stay here I left it low, I left it rear Hear that hush on the edge of the pine It hits like thunder then it shines I burn, I bend, I don't confess I found my calm in the wreck Black Mountain, take me in Black Mountain, peace within I rebel, I rise, I breathe again Black Mountain, peace within Peace within Peace within No gold crown, no holy hall Just a crack in the shale wall I traced my pulse in the stone And heard my wild heart home The sky wore bruises of blue The river could glean through I laughed at the weight I wore Then laid it down on the floor Hear that hush on the edge of the pine It hits like thunder, then it shines I burn, I bend, I don't confess I found my calm in the wreck Black Mountain, take me in Black Mountain, peace within I'll blow, I'll rise, I'll breathe again Black Mountain, peace within Peace within Peace within Let the old storm call my name I won't kneel to the same old flame I learned the hard way, iron and stone Peace is a place I make my own Black Mountain, take me in Black Mountain, peace within I build, I rise, I breathe again Black Mountain, peace within Peace within Peace within I'm out."
+      }
+    },
+    "sheetAvailable": true,
+    "chords": [
+      "Em",
+      "C",
+      "G",
+      "D"
+    ],
+    "key": "Fm",
+    "timeSignature": "4/4",
+    "chordSheet": "CHORD SHEET\nKey: Fm \u00b7 BPM: 70 \u00b7 Time Signature: 4/4\n\n[Intro]\n| Em | C | G | D |\n\n[Verse]\n| Em | C | G | D |\n| C | G | D | Em |\n\n[Hook]\n| G | D | Em | C |\n| D | Em | C | G |\n\nPerformance Notes:\nKeep the feel rebellious, dark and let the Lo-fi, R&B groove breathe.",
+    "musicSheet": {
+      "title": "Song NXET",
+      "key": "Fm",
+      "bpm": 70,
+      "timeSignature": "4/4",
+      "scale": "Fm major/minor modal color",
+      "mood": "Rebellious, Dark",
+      "genre": "Lo-fi, R&B",
+      "melodySketch": [
+        "Bar 1: F - A - D - A",
+        "Bar 2: G - A - C",
+        "Bar 3: D - C - A - G"
+      ],
+      "arrangement": [
+        "Piano/Synth: Main harmonic bed using Em, C, G, D",
+        "Bass: Root-note movement that follows each bar",
+        "Drums: Light rhythmic support with space for the vocal or lead",
+        "Lead Texture: Reinforce the rebellious, dark mood with Guitar, Synth"
+      ],
+      "productionNotes": [
+        "Keep transitions clean and loop-friendly.",
+        "Use the hook section as the loudest point of the preview.",
+        "Avoid overfilling the midrange so the main melody stays readable."
+      ]
+    },
+    "favorite": false,
+    "fav": false,
+    "ownerEmail": "lustsinpride@gmail.com"
+  }
+]

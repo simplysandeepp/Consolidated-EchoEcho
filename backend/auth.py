@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import base64
 import secrets
 from pathlib import Path
 from threading import Lock
@@ -88,7 +89,40 @@ def user_email_for_token(token: str) -> str | None:
         return None
     with _sessions_lock:
         email = _read_sessions().get(cleaned)
-    return email.strip().lower() if email else None
+    if email:
+        return email.strip().lower()
+    claims = firebase_claims_for_token(cleaned)
+    email = str(claims.get("email") or "").strip().lower()
+    return email or None
+
+
+def firebase_claims_for_token(token: str) -> dict[str, object]:
+    """Decode non-sensitive Firebase ID token claims for local user routing.
+
+    Firebase verifies the sign-in in the browser. The backend only needs the
+    stable user key so JSON files are isolated per account; malformed tokens
+    simply behave like an anonymous/default session.
+    """
+    parts = token.split(".")
+    if len(parts) < 2:
+        return {}
+    payload = parts[1]
+    payload += "=" * (-len(payload) % 4)
+    try:
+        decoded = base64.urlsafe_b64decode(payload.encode("ascii"))
+        data = json.loads(decoded.decode("utf-8"))
+    except (ValueError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def user_name_for_token(token: str) -> str:
+    claims = firebase_claims_for_token(token.strip())
+    name = str(claims.get("name") or "").strip()
+    if name:
+        return name
+    email = str(claims.get("email") or "").strip().lower()
+    return user_name_for_email(email) if email else ""
 
 
 def user_name_for_email(email: str) -> str:

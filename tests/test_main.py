@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import json
 from pathlib import Path
 
@@ -11,6 +12,14 @@ import backend.main as main
 import backend.auth as auth
 import backend.api_generator as api
 from backend.api_generator import GenerationInput, KieAIConfigError, KieAIResponseError, submit_to_suno, validate_kieai_config
+
+
+def firebase_token(email: str, name: str = "") -> str:
+    header = base64.urlsafe_b64encode(json.dumps({"alg": "none"}).encode("utf-8")).decode("ascii").rstrip("=")
+    payload = base64.urlsafe_b64encode(
+        json.dumps({"email": email, "name": name or email.split("@")[0]}).encode("utf-8")
+    ).decode("ascii").rstrip("=")
+    return f"{header}.{payload}.signature"
 
 
 def test_frontend_pages_load() -> None:
@@ -204,6 +213,65 @@ def test_history_is_scoped_to_authenticated_user(tmp_path: Path, monkeypatch) ->
     assert [song["song_id"] for song in first] == ["ABCD"]
     assert [song["song_id"] for song in second] == ["WXYZ"]
     assert client.get("/song/WXYZ", headers={"Authorization": f"Bearer {token_a}"}).status_code == 404
+
+
+def test_tracks_api_is_scoped_to_firebase_email(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(main, "USER_DATA_DIR", tmp_path / "users")
+    monkeypatch.setattr(main, "USER_STATE_FILE", tmp_path / "library_state.json")
+    main.ensure_files()
+
+    token_a = firebase_token("pride@gmail.com", "Pride")
+    token_b = firebase_token("vaibhavyadav@gmail.com", "Vaibhav Yadav")
+    user_a = main.user_id_from_email("pride@gmail.com")
+    user_b = main.user_id_from_email("vaibhavyadav@gmail.com")
+
+    main.save_user_song(
+        user_a,
+        {
+            "song_id": "AXGV",
+            "code": "AXGV",
+            "title": "Song AXGV",
+            "genre": "rock",
+            "duration": 60,
+            "original_audio_filename": "ECHO_AXGV_ace.mp3",
+        },
+        user_email="pride@gmail.com",
+        user_name="Pride",
+    )
+    main.save_user_song(
+        user_b,
+        {
+            "song_id": "ZRGV",
+            "code": "ZRGV",
+            "title": "Song ZRGV",
+            "genre": "melancholy",
+            "duration": 30,
+            "favorite": True,
+            "original_audio_filename": "ZRGV.wav",
+        },
+        user_email="vaibhavyadav@gmail.com",
+        user_name="Vaibhav Yadav",
+    )
+
+    client = TestClient(main.app)
+    first = client.get("/api/tracks", headers={"Authorization": f"Bearer {token_a}"}).json()
+    second = client.get("/api/tracks", headers={"Authorization": f"Bearer {token_b}"}).json()
+
+    assert [track["song_id"] for track in first] == ["AXGV"]
+    assert [track["song_id"] for track in second] == ["ZRGV"]
+    assert client.get("/tracks/ZRGV", headers={"Authorization": f"Bearer {token_a}"}).status_code == 404
+
+    fav = client.patch(
+        "/api/tracks/AXGV",
+        headers={"Authorization": f"Bearer {token_a}"},
+        json={"favorite": True},
+    )
+    assert fav.status_code == 200
+    assert client.get("/api/tracks", headers={"Authorization": f"Bearer {token_a}"}).json()[0]["favorite"] is True
+    assert client.get("/api/tracks", headers={"Authorization": f"Bearer {token_b}"}).json()[0]["favorite"] is True
+
+    assert client.delete("/api/tracks/AXGV", headers={"Authorization": f"Bearer {token_b}"}).status_code == 404
+    assert client.get("/api/tracks", headers={"Authorization": f"Bearer {token_a}"}).json()[0]["song_id"] == "AXGV"
 
 
 def test_generate_endpoint_saves_generated_song(tmp_path: Path, monkeypatch) -> None:
